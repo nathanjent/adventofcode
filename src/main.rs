@@ -1,9 +1,74 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::collections::HashMap;
-use std::fmt;
 use std::io::BufReader;
-use std::str::FromStr;
+use std::fmt;
+
+#[derive(Hash, Eq, PartialEq, Debug)]
+enum Op {
+    Store,
+    And,
+    Or,
+    LShift,
+    RShift,
+    Not,
+}
+
+#[derive(Hash, Eq, PartialEq, Debug)]
+struct Operation {
+    l: String,
+    r: String,
+    op: Op,
+}
+
+impl Operation {
+    fn new(l: String, r: String, op: Op) -> Operation {
+        Operation { l: l, r: r, op: op }
+    }
+    
+    fn execute(&self, ops: &HashMap<String, Operation>) 
+            -> u16 {
+        let l_val;
+        let r_val;
+        match self.l.parse::<u16>() {
+            Ok(n) => l_val = n,
+            Err(_) => {
+                l_val = match ops.get(&self.l) {
+                    Some(operation) => 
+                        operation.execute(&ops),
+                    None => 0, // operation might not use l_val
+                }
+            }
+        }
+        match self.r.parse::<u16>() {
+            Ok(n) => r_val = n,
+            Err(_) => {
+                r_val = match ops.get(&self.r) {
+                    Some(operation) => 
+                        operation.execute(&ops),
+                    None => 0, // operation might not use r_val
+                }
+            }
+        }
+        //println!("{}", &self);
+        //println!("left: {}, right: {}", &l_val, &r_val);
+        match self.op {
+            Op::Store => r_val,
+            Op::Not => !r_val,
+            Op::And => l_val & r_val,
+            Op::Or => l_val | r_val,
+            Op::LShift => l_val << r_val,
+            Op::RShift => l_val >> r_val,
+        }
+    }
+}
+
+impl fmt::Display for Operation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {:?} {} ->", self.l, self.op, self.r)
+    }
+}
+
 
 fn main() {
     let input = File::open("input.txt")
@@ -11,104 +76,57 @@ fn main() {
         .expect("File open fail.");
     let reader = BufReader::new(input);
 
-    let mut lights = HashMap::new();
-
-    #[derive(Hash, Eq, PartialEq, Debug)]
-    struct Light {
-        b: u32,
-    }
-
-    #[derive(Hash, Eq, PartialEq, Debug)]
-    struct Loc {
-        x: isize,
-        y: isize,
-    }
-
-    impl Light {
-        fn new(b: u32) -> Light {
-            Light { b: b }
-        }
-
-        fn toggle(&mut self) {
-            self.inc();
-            self.inc();
-        }
-
-        fn dec(&mut self) {
-            if self.b > 0 { self.b -= 1; }
-        }
-
-        fn inc(&mut self) {
-            self.b += 1;
-        }
-    }
-
-    impl Loc {
-        fn new(x: isize, y: isize) -> Loc {
-            Loc { x: x, y: y }
-        }
-    }
-
-    impl fmt::Display for Light {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "s: {:?}", self.b)
-        }
-    }
-
-    impl fmt::Display for Loc {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            write!(f, "x: {}, y: {}", self.x, self.y)
-        }
-    }
-
-
+    let mut operations = Box::new(HashMap::new());
     for line in reader.lines() {
         let s = line.unwrap();
         let words: Vec<&str> = s
             .split_whitespace()
             .collect();
-        let toggle;
-        let xy0;
-        let xy1;
-        let loc0: Vec<&str>;
-        if words[0] == "turn" { 
-            toggle = false;
-            loc0 = words[2].split(',').collect();
-        } else {
-            toggle = true;
-            loc0 = words[1].split(',').collect();
-        }
-        xy0 = (isize::from_str(loc0[0]).unwrap(),
-            isize::from_str(loc0[1]).unwrap());
-        let loc1: Vec<&str> = words[words.len() - 1]
-            .split(',')
-            .collect();
-        xy1 = (isize::from_str(loc1[0]).unwrap(),
-            isize::from_str(loc1[1]).unwrap());
-//println!("({},{})-({},{})", xy0.0, xy0.1, xy1.0, xy1.1);
-        for x in xy0.0..(xy1.0 + 1) {
-            for y in xy0.1..(xy1.1 + 1) {
-                let loc = Loc::new(x, y);
-                let light = lights
-                    .entry(loc)
-                    .or_insert(Light::new(0));
-                if toggle {
-                    light.toggle();
-                } else {
-                    if words[1] == "on" { 
-                        light.inc() 
-                    }
-                    else {
-                        light.dec();
-                    }
+        let size = words.len();
+        // result is stored to last word
+        let to = words[size - 1].to_string();
+        let op;
+        match size {
+            3 => { // store ->
+                let l = words[0].to_string();
+                op = Operation::new(
+                "".to_string(), 
+                l.to_string(), 
+                Op::Store);
+            }
+            4 => { // NOT
+                let l = words[1].to_string();
+                op = Operation::new(
+                "".to_string(), 
+                l.to_string(), 
+                Op::Not);
+            }
+            5 => { // AND, OR, LSHIFT, RSHIFT
+                let l = words[0].to_string();
+                let r = words[2].to_string();
+                op = match words[1] {
+                    "AND" => Operation::new(l, r, Op::And),
+                    "OR" => Operation::new(l, r, Op::Or),
+                    "LSHIFT" => Operation::new(l, r, Op::LShift),
+                    "RSHIFT" => Operation::new(l, r, Op::RShift),
+                    _ => continue,
                 }
             }
+            _ => continue,
         }
+        &operations.insert(to, op);
     }
-    let mut brightness = 0;
-    for (_, light) in lights.iter() {
-        brightness += light.b;
+    for (key, op) in operations.iter() {
+        println!("{} {}", op, key);
     }
-    println!("total brightness of lights: {}", brightness); 
+
+    let key = "a";
+    match operations.get(key) {
+        Some(var) => println!( 
+            "{}: {}", 
+            key, 
+            var.execute(&operations)),
+        None => println!("Value not found."),
+    }
 }
 
