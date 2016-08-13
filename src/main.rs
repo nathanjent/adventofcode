@@ -1,74 +1,60 @@
 use std::fs::File;
-use std::io::prelude::*;
 use std::collections::HashMap;
+use std::io::prelude::*;
 use std::io::BufReader;
 use std::fmt;
+use std::str;
+use std::str::FromStr;
 
-#[derive(Hash, Eq, PartialEq, Debug)]
-enum Op {
-    Store,
+#[derive(Debug)]
+enum Token {
+    Op(Operator),
+    Mem(Register),
+    Set,
+    Start,
+}
+
+#[derive(Debug)]
+enum Operator {
     And,
     Or,
     LShift,
     RShift,
     Not,
+    Unknown,
 }
 
-#[derive(Hash, Eq, PartialEq, Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
+enum Register {
+    Value(i32),
+    Address(String),
+    Unknown,
+}
+
+#[derive(Debug)]
 struct Operation {
-    l: String,
-    r: String,
-    op: Op,
-}
-
-impl Operation {
-    fn new(l: String, r: String, op: Op) -> Operation {
-        Operation { l: l, r: r, op: op }
-    }
-    
-    fn execute(&self, ops: &HashMap<String, Operation>) 
-            -> u16 {
-        let l_val;
-        let r_val;
-        match self.l.parse::<u16>() {
-            Ok(n) => l_val = n,
-            Err(_) => {
-                l_val = match ops.get(&self.l) {
-                    Some(operation) => 
-                        operation.execute(&ops),
-                    None => 0, // operation might not use l_val
-                }
-            }
-        }
-        match self.r.parse::<u16>() {
-            Ok(n) => r_val = n,
-            Err(_) => {
-                r_val = match ops.get(&self.r) {
-                    Some(operation) => 
-                        operation.execute(&ops),
-                    None => 0, // operation might not use r_val
-                }
-            }
-        }
-        //println!("{}", &self);
-        //println!("left: {}, right: {}", &l_val, &r_val);
-        match self.op {
-            Op::Store => r_val,
-            Op::Not => !r_val,
-            Op::And => l_val & r_val,
-            Op::Or => l_val | r_val,
-            Op::LShift => l_val << r_val,
-            Op::RShift => l_val >> r_val,
-        }
-    }
+    operator: Operator,
+    left: Register,
+    right: Register,
+    to: Register,
 }
 
 impl fmt::Display for Operation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {:?} {} ->", self.l, self.op, self.r)
+        write!(f, "{:?} {:?} {:?}", self.left, self.operator, self.right)
     }
 }
 
+impl Default for Operation {
+    fn default() -> Operation {
+        Operation {
+            operator: Operator::Unknown,
+            left: Register::Unknown,
+            right: Register::Unknown,
+            to: Register::Unknown,
+        }
+    }
+}
 
 fn main() {
     let input = File::open("input.txt")
@@ -76,57 +62,85 @@ fn main() {
         .expect("File open fail.");
     let reader = BufReader::new(input);
 
-    let mut operations = Box::new(HashMap::new());
+    let mut operations = HashMap::new();
     for line in reader.lines() {
-        let s = line.unwrap();
-        let words: Vec<&str> = s
-            .split_whitespace()
-            .collect();
-        let size = words.len();
-        // result is stored to last word
-        let to = words[size - 1].to_string();
-        let op;
-        match size {
-            3 => { // store ->
-                let l = words[0].to_string();
-                op = Operation::new(
-                "".to_string(), 
-                l.to_string(), 
-                Op::Store);
+        let line = line.unwrap();
+        let tokens: Vec<Token> = line.split_whitespace().map(|s| {
+            match s {
+                "AND" => Token::Op(Operator::And),
+                "OR" => Token::Op(Operator::Or),
+                "LSHIFT" => Token::Op(Operator::LShift),
+                "RSHIFT" => Token::Op(Operator::RShift),
+                "NOT" => Token::Op(Operator::Not),
+                "->" => Token::Set,
+                _ => {
+                    let m = s.to_string();
+                    match m.parse::<i32>() {
+                        Ok(n) => Token::Mem(Register::Value(n)),
+                        Err(_) => Token::Mem(Register::Address(m)),
+                    }
+                },
             }
-            4 => { // NOT
-                let l = words[1].to_string();
-                op = Operation::new(
-                "".to_string(), 
-                l.to_string(), 
-                Op::Not);
-            }
-            5 => { // AND, OR, LSHIFT, RSHIFT
-                let l = words[0].to_string();
-                let r = words[2].to_string();
-                op = match words[1] {
-                    "AND" => Operation::new(l, r, Op::And),
-                    "OR" => Operation::new(l, r, Op::Or),
-                    "LSHIFT" => Operation::new(l, r, Op::LShift),
-                    "RSHIFT" => Operation::new(l, r, Op::RShift),
-                    _ => continue,
-                }
-            }
-            _ => continue,
-        }
-        &operations.insert(to, op);
-    }
-    for (key, op) in operations.iter() {
-        println!("{} {}", op, key);
-    }
+        }).collect();
 
-    let key = "a";
-    match operations.get(key) {
-        Some(var) => println!( 
-            "{}: {}", 
-            key, 
-            var.execute(&operations)),
-        None => println!("Value not found."),
+        let mut operation = Operation::default();
+
+        let mut to = Register::Unknown;
+
+        let mut prev = Token::Start;
+        for token in tokens {
+            match prev {
+                Token::Start => {
+                    match token {
+                        Token::Op(o) => {
+                            operation.operator = o;
+                            prev = Token::Op(Operator::Unknown);
+                        },
+                        Token::Mem(m) => {
+                            operation.left = m;
+                            prev = Token::Mem(Register::Unknown);
+                        },
+                        _ => {},
+                    }
+                },
+                Token::Mem(_) => {
+                    match token {
+                        Token::Op(o) => {
+                            operation.operator = o;
+                            prev = Token::Op(Operator::Unknown);
+                        },
+                        Token::Set => prev = Token::Set,
+                        _ => {},
+                    }
+                },
+                Token::Op(_) => {
+                    match token {
+                        Token::Mem(m) => {
+                            operation.right = m;
+                            prev = Token::Mem(Register::Unknown);
+                        },
+                        _ => {},
+                    }
+                },
+                Token::Set => {
+                    match token {
+                        Token::Mem(m) => {
+                            to = m;
+                            prev = Token::Mem(Register::Unknown);
+                        },
+                        _ => {},
+                    }
+                },
+            }
+        }
+        operations.insert(to, operation);
+    }
+    //for (register, operation) in operations {
+    //    println!("{} -> {:?}", operation, register);
+    //}
+    let mut search_key = Register::Address("a".to_string());
+    loop {
+        let operation = operations.entry(search_key).or_insert(Operation::default());
+        break;    
     }
 }
-

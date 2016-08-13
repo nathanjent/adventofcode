@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Nathan Jent <nathanjent@gmail.com>"]
 
 [dependencies]
- md5 = "0.1.1"
+md5 = "0.1.1"
 regex = "0.1"
+nom = "1.2.4"
