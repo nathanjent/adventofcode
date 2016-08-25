@@ -180,7 +180,7 @@ fn calculate(search_key: String, operations: &HashMap<String, Operation>, regist
     let register = registers.borrow().get(&search_key.clone()).cloned();
     match register {
         Some(v) => {
-            println!("Already calculated: {} = {}", operation.parent, v);
+//            println!("Already calculated: {} = {}", operation.parent, v);
             return Some(v)
         },
         None => {},
@@ -210,7 +210,7 @@ fn calculate(search_key: String, operations: &HashMap<String, Operation>, regist
             let l = l.unwrap();
             let r = r.unwrap();
             let v = l & r;
-            println!("*{} = {} & {} <- {}", v,  l, r, operation);
+//            println!("*{} = {} & {} <- {}", v,  l, r, operation);
             registers.borrow_mut().insert(search_key.clone(), v);
             Some(v)
         },
@@ -218,7 +218,7 @@ fn calculate(search_key: String, operations: &HashMap<String, Operation>, regist
             let l = l.unwrap();
             let r = r.unwrap();
             let v = l | r;
-            println!("*{} = {} | {} <- {}", v,  l, r, operation);
+//            println!("*{} = {} | {} <- {}", v,  l, r, operation);
             registers.borrow_mut().insert(search_key.clone(), v);
             Some(v)
         },
@@ -226,25 +226,25 @@ fn calculate(search_key: String, operations: &HashMap<String, Operation>, regist
             let l = l.unwrap();
             let r = r.unwrap();
             let v = l << r;
-            println!("*{} = {} << {} <- {}", v,  l, r, operation);
+//            println!("*{} = {} << {} <- {}", v,  l, r, operation);
             Some(v)
         },
         Operator::RShift => {
             let l = l.unwrap();
             let r = r.unwrap();
             let v = l >> r;
-            println!("*{} = {} >> {} <- {}", v,  l, r, operation);
+//            println!("*{} = {} >> {} <- {}", v,  l, r, operation);
             Some(v)
         },
         Operator::Not => {
             let r = r.unwrap();
             let v = !r;
-            println!("*{} = !{} <- {}", v, r, operation);
+//            println!("*{} = !{} <- {}", v, r, operation);
             Some(v)
         },
         Operator::Set => {
             let l = l.unwrap();
-            println!("*{} <- {}", l, operation);
+//            println!("*{} <- {}", l, operation);
             Some(l)
         },
     }

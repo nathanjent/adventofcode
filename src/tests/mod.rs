@@ -5,6 +5,7 @@ use day04;
 use day05;
 use day06;
 use day07;
+use day08;
 
 #[test]
 fn day01test1() {
@@ -74,5 +75,15 @@ fn day07test1() {
 
 #[test]
 fn day07test2() {
-    println!("{:?}", day07::assembly_required("input/day07.txt", "b", 956));
+    assert_eq!(day07::assembly_required("input/day07.txt", "b", 956), 40149);
+}
+
+#[test]
+fn day08test1() {
+    assert_eq!(day08::matchsticks("input/day08.txt"), 0);
+}
+
+#[test]
+fn day08test2() {
+    assert_eq!(day08::matchsticks("input/day08.txt"), 0);
 }
