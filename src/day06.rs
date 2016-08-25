@@ -13,7 +13,8 @@ enum State {
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 struct Light {
-    s: State,
+    state: State,
+    brightness: u32,
 }
 
 #[derive(Hash, Eq, PartialEq, Debug)]
@@ -23,20 +24,33 @@ struct Loc {
 }
 
 impl Light {
-    fn new(s: State) -> Light {
-        Light { s: s }
+    fn new(s: State, brightness: u32) -> Light {
+        Light { state: s, brightness: brightness }
+    }
+
+    fn toggle_brightness(&mut self) {
+        self.inc();
+        self.inc();
+    }
+
+    fn dec(&mut self) {
+        if self.brightness > 0 { self.brightness -= 1; }
+    }
+
+    fn inc(&mut self) {
+        self.brightness += 1;
     }
 
     fn toggle(&mut self) {
-        if self.s == State::Off { 
+        if self.state == State::Off { 
             self.switch(State::On);
         } else {
             self.switch(State::Off);
         }
     }
 
-    fn switch(&mut self, s: State) {
-        self.s = s;
+    fn switch(&mut self, state: State) {
+        self.state = state;
     }
 }
 
@@ -48,7 +62,7 @@ impl Loc {
 
 impl fmt::Display for Light {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "s: {:?}", self.s)
+        write!(f, "state: {:?}, brightness: {}", self.state, self.brightness)
     }
 }
 
@@ -58,7 +72,7 @@ impl fmt::Display for Loc {
     }
 }
 
-pub fn fire_hazard(file: &str) -> i32 {
+pub fn fire_hazard_1(file: &str) -> u32 {
     let input = File::open(file)
         .expect("File open fail.");
     let reader = BufReader::new(input);
@@ -94,7 +108,7 @@ pub fn fire_hazard(file: &str) -> i32 {
                 let loc = Loc::new(x, y);
                 let light = lights
                     .entry(loc)
-                    .or_insert(Light::new(State::Off));
+                    .or_insert(Light::new(State::Off, 0));
                 if toggle {
                     light.toggle();
                 } else {
@@ -110,8 +124,62 @@ pub fn fire_hazard(file: &str) -> i32 {
     }
     let mut count = 0;
     for (_, light) in lights.iter() {
-        if light.s == State::On { count += 1; }
+        if light.state == State::On { count += 1; }
     }
     count
 }
 
+pub fn fire_hazard_2(file: &str) -> u32 {
+    let input = File::open(file)
+        .expect("File open fail.");
+    let reader = BufReader::new(input);
+
+    let mut lights = HashMap::new();
+
+    for line in reader.lines() {
+        let s = line.unwrap();
+        let words: Vec<&str> = s.split_whitespace()
+            .collect();
+        let toggle;
+        let loc0: Vec<&str>;
+        if words[0] == "turn" { 
+            toggle = false;
+            loc0 = words[2].split(',').collect();
+        } else {
+            toggle = true;
+            loc0 = words[1].split(',').collect();
+        }
+        let loc1: Vec<&str> = words[words.len() - 1]
+            .split(',')
+            .collect();
+
+        let xy0 = (isize::from_str(loc0[0]).unwrap(),
+            isize::from_str(loc0[1]).unwrap());
+        let xy1 = (isize::from_str(loc1[0]).unwrap(),
+            isize::from_str(loc1[1]).unwrap());
+//println!("({},{})-({},{})", xy0.0, xy0.1, xy1.0, xy1.1);
+        for x in xy0.0..(xy1.0 + 1) {
+            for y in xy0.1..(xy1.1 + 1) {
+                let loc = Loc::new(x, y);
+                let light = lights
+                    .entry(loc)
+                    .or_insert(Light::new(State::On, 0));
+                if toggle {
+                    light.toggle_brightness();
+                } else {
+                    if words[1] == "on" { 
+                        light.inc() 
+                    }
+                    else {
+                        light.dec();
+                    }
+                }
+            }
+        }
+    }
+    let mut brightness = 0;
+    for (_, light) in lights.iter() {
+        brightness += light.brightness;
+    }
+    brightness
+}

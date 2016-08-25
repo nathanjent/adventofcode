@@ -60,12 +60,12 @@ fn day05test2() {
 
 #[test]
 fn day06test1() {
-    assert_eq!(day06::fire_hazard("input/day06.txt"), 377891);
+    assert_eq!(day06::fire_hazard_1("input/day06.txt"), 377891);
 }
 
 #[test]
 fn day06test2() {
-    assert_eq!(day06::fire_hazard("input/day06.txt"), 14110788);
+    assert_eq!(day06::fire_hazard_2("input/day06.txt"), 14110788);
 }
 
 #[test]
