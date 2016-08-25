@@ -53,7 +53,6 @@ fn day05test1() {
 }
 
 #[test]
-#[ignore]
 fn day05test2() {
     assert_eq!(day05::intern_elves_2("input/day05.txt"), 51);
 }
