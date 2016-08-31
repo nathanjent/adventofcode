@@ -38,31 +38,41 @@ pub fn intern_elves_2(file: &str) -> i32 {
         .expect("File open fail.");
     let reader = BufReader::new(input);
     let mut count = 0;
-    let matching_pairs_re = Regex::new(r"([a-z][a-z])").unwrap();
-    let single_partition_re = Regex::new(r"([a-z]).{1}([a-z])").unwrap();
-    for line in reader.lines() {
-        let s: String = line.unwrap();
 
+    for line in reader.lines() {
+        let mut s: String = line.unwrap();
+        let mut s_cln = s.clone();
+
+        println!("{}", s);
         let mut matched_pairs = false;
-        for i in matching_pairs_re.captures(&s).unwrap().iter() {
-            for j in matching_pairs_re.captures(&s).unwrap().iter() {
-                let i = i.unwrap();
-                let j = j.unwrap();
-                matched_pairs = i == j;
-                if matched_pairs { break; }
+        while let Some(last) = s.pop() {
+            if let Some(next) = s.pop() {
+                let mut pair = String::new();
+                pair.push(next);
+                pair.push(last);
+                matched_pairs = s.contains(pair.as_str());
+                if matched_pairs {
+                    println!("{}", pair);
+                    break;
+                }
+                s.push(next);
             }
         }
 
-        let (single_partition, _) = single_partition_re.captures(&s)
-            .unwrap()
-            .iter()
-            .scan((false, ""), |state, cap| {
-                let (_, prev) = *state;
-                let curr = cap.unwrap();
-                *state = (prev == curr, curr);
-                Some(*state)
-            })
-        .last().unwrap();
+        let mut single_partition = false;
+        while let Some(last) = s_cln.pop() {
+            if let Some(mid) = s_cln.pop() {
+                if let Some(first) = s_cln.pop() {
+                    single_partition = last == first;
+                    if single_partition {
+                        println!("{}{}{}", first, mid, last);
+                        break;
+                    }
+                    s_cln.push(first);
+                    s_cln.push(mid);
+                }
+            }
+        }
 
         if matched_pairs && single_partition {
             count += 1;
