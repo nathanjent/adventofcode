@@ -6,6 +6,7 @@ use day05;
 use day06;
 use day07;
 use day08;
+use day09;
 
 #[test]
 fn day01test1() {
@@ -85,4 +86,14 @@ fn day08test1() {
 #[test]
 fn day08test2() {
     assert_eq!(day08::matchsticks_2("input/day08.txt"), 2117);
+}
+
+#[test]
+fn day09test1() {
+    assert_eq!(day09::single_night("input/day09.txt"), 0);
+}
+
+#[test]
+fn day09test2() {
+    assert_eq!(day09::single_night("input/day09.txt"), 0);
 }
