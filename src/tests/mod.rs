@@ -79,10 +79,10 @@ fn day07test2() {
 
 #[test]
 fn day08test1() {
-    assert_eq!(day08::matchsticks("input/day08.txt"), 0);
+    assert_eq!(day08::matchsticks_1("input/day08.txt"), 1371);
 }
 
 #[test]
 fn day08test2() {
-    assert_eq!(day08::matchsticks("input/day08.txt"), 0);
+    assert_eq!(day08::matchsticks_2("input/day08.txt"), 2117);
 }
