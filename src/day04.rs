@@ -3,13 +3,12 @@ use std::fs::File;
 use std::io::prelude::*;
 
 pub fn ideal_stocking_stuffer(file: &str, leading_zeros: usize) -> i32 {
-    let mut file = File::open(file)
-        .expect("File open fail.");
+    let mut file = File::open(file).expect("File open fail.");
     let mut input = String::new();
-    file.read_to_string(&mut input) 
+    file.read_to_string(&mut input)
         .expect("File read fail.");
     let mut input = String::from(input.trim());
-    
+
     let mut leading = String::new();
     for _ in 1..(leading_zeros + 1) {
         leading.push('0');
@@ -21,7 +20,7 @@ pub fn ideal_stocking_stuffer(file: &str, leading_zeros: usize) -> i32 {
         let test: [u8; 16];
         let num_str = num.to_string();
         input.push_str(&num_str);
-        //println!("{}", input);
+        // println!("{}", input);
         {
             test = md5::compute(input.as_bytes());
             let mut out = String::new();
@@ -34,9 +33,9 @@ pub fn ideal_stocking_stuffer(file: &str, leading_zeros: usize) -> i32 {
             if out.starts_with(leading.as_str()) {
                 println!("{} answer!", input);
                 println!("{} ", out);
-                return num
+                return num;
             }
-            //println!("{}", out);
+            // println!("{}", out);
         }
         // Reset input
         input.truncate(file_len);

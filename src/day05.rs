@@ -4,12 +4,11 @@ use std::io::BufReader;
 use regex::Regex;
 
 pub fn intern_elves_1(file: &str) -> i32 {
-    let input = File::open(file)
-        .expect("File open fail.");
+    let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
     let mut count = 0;
     let v_re = Regex::new(r"[aeiou].*[aeiou].*[aeiou]").unwrap();
-    //let dub_re = Regex::new(r"([A-Za-z])").unwrap();
+    // let dub_re = Regex::new(r"([A-Za-z])").unwrap();
     let not_re = Regex::new(r"ab|cd|pq|xy").unwrap();
     for line in reader.lines() {
         let s = line.unwrap();
@@ -17,25 +16,24 @@ pub fn intern_elves_1(file: &str) -> i32 {
         let mut dubs = false;
         let mut p = '0';
         for c in s.chars() {
-            if c == p { 
+            if c == p {
                 dubs = true;
                 break;
             }
             p = c;
         }
         let ugly = not_re.is_match(&s);
-        //println!("{}", s);
+        // println!("{}", s);
         if vowels && dubs && !ugly {
             count += 1;
-            //println!("{}", s);
+            // println!("{}", s);
         }
     }
     count
 }
 
 pub fn intern_elves_2(file: &str) -> i32 {
-    let input = File::open(file)
-        .expect("File open fail.");
+    let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
     let mut count = 0;
 
@@ -76,7 +74,7 @@ pub fn intern_elves_2(file: &str) -> i32 {
 
         if matched_pairs && single_partition {
             count += 1;
-            //println!("{}", s);
+            // println!("{}", s);
         }
     }
     count
