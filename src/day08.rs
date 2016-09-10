@@ -12,7 +12,7 @@ pub fn matchsticks_1(file: &str) -> i32 {
         let line = line.unwrap();
         let s = String::from(line.trim());
         let lit_c = s.len();
- //       println!("{} length: {}", s, lit_c);
+        //       println!("{} length: {}", s, lit_c);
         let mut mem_c = 0;
         let mut sr: String = s.chars().rev().collect();
         while let Some(c) = sr.pop() {
@@ -22,37 +22,39 @@ pub fn matchsticks_1(file: &str) -> i32 {
                         match x {
                             '\\' => {
                                 mem_c += 1;
-//                                println!("{}{} +1", c, x);
-                            },
+                                // println!("{}{} +1", c, x);
+                            }
                             '"' => {
                                 mem_c += 1;
-//                                println!("{}{} +1", c, x);
-                            },
+                                // println!("{}{} +1", c, x);
+                            }
                             'x' => {
                                 if let Some(a) = sr.pop() {
                                     if let Some(b) = sr.pop() {
                                         if a.is_digit(16) && b.is_digit(16) {
                                             mem_c += 1;
-//                                            println!("{}{}{}{} +1", c, x, a, b);
+                                            // println!("{}{}{}{} +1", c, x, a, b);
                                         }
                                     }
                                 }
-                            },
-                            _ => { sr.push(x); },
+                            }
+                            _ => {
+                                sr.push(x);
+                            }
                         }
                     }
                 }
                 if c.is_alphabetic() {
-//                    println!("{} +1", c);
+                    // println!("{} +1", c);
                     mem_c += 1;
                 }
             }
         }
         lit_count += lit_c;
         mem_count += mem_c;
-//        println!("{} - {} = {}", lit_c, mem_c, lit_c as i32 - mem_c); 
-//        println!("lit: {}, mem: {}, Total: {}", 
-//                 lit_count, mem_count, lit_count as i32 - mem_count);
+        // println!("{} - {} = {}", lit_c, mem_c, lit_c as i32 - mem_c);
+        // println!("lit: {}, mem: {}, Total: {}",
+        // lit_count, mem_count, lit_count as i32 - mem_count);
     }
     lit_count as i32 - mem_count
 }
@@ -67,27 +69,27 @@ pub fn matchsticks_2(file: &str) -> i32 {
         let line = line.unwrap();
         let mut s = String::from(line.trim());
         let lit_c = s.len();
-//        println!("{} length: {}", s, lit_c);
+        //        println!("{} length: {}", s, lit_c);
         let mut enc_c = 0;
         while let Some(c) = s.pop() {
             match c {
                 '"' => {
                     enc_c += 2;
-                },
+                }
                 '\\' => {
                     enc_c += 2;
-                },
+                }
                 _ => {
                     enc_c += 1;
-                },
+                }
             }
         }
         enc_c += 2; // outer quotes
         enc_count += enc_c;
         lit_count += lit_c;
-//        println!("{} - {} = {}", enc_c, lit_c, enc_c - lit_c as i32); 
-//        println!("enc: {}, lit: {}, Total: {}", 
-//                 enc_count, lit_count, enc_count - lit_count as i32);
+        // println!("{} - {} = {}", enc_c, lit_c, enc_c - lit_c as i32);
+        // println!("enc: {}, lit: {}, Total: {}",
+        // enc_count, lit_count, enc_count - lit_count as i32);
     }
     enc_count - lit_count as i32
 }
