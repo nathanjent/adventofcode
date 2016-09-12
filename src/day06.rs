@@ -89,7 +89,7 @@ pub fn fire_hazard_1(file: &str) -> u32 {
     for line in reader.lines() {
         let s = line.unwrap();
         let words: Vec<&str> = s.split_whitespace()
-                                .collect();
+            .collect();
         let toggle;
         let loc0: Vec<&str>;
         if words[0] == "turn" {
@@ -100,8 +100,8 @@ pub fn fire_hazard_1(file: &str) -> u32 {
             loc0 = words[1].split(',').collect();
         }
         let loc1: Vec<&str> = words[words.len() - 1]
-                                  .split(',')
-                                  .collect();
+            .split(',')
+            .collect();
 
         let top_left = (isize::from_str(loc0[0]).unwrap(), isize::from_str(loc0[1]).unwrap());
         let bottom_right = (isize::from_str(loc1[0]).unwrap(), isize::from_str(loc1[1]).unwrap());
@@ -111,7 +111,7 @@ pub fn fire_hazard_1(file: &str) -> u32 {
             for y in top_left.1..(bottom_right.1 + 1) {
                 let loc = Loc::new(x, y);
                 let light = lights.entry(loc)
-                                  .or_insert(Light::new(State::Off, 0));
+                    .or_insert(Light::new(State::Off, 0));
                 if toggle {
                     light.toggle();
                 } else {
@@ -142,7 +142,7 @@ pub fn fire_hazard_2(file: &str) -> u32 {
     for line in reader.lines() {
         let s = line.unwrap();
         let words: Vec<&str> = s.split_whitespace()
-                                .collect();
+            .collect();
         let toggle;
         let loc0: Vec<&str>;
         if words[0] == "turn" {
@@ -153,8 +153,8 @@ pub fn fire_hazard_2(file: &str) -> u32 {
             loc0 = words[1].split(',').collect();
         }
         let loc1: Vec<&str> = words[words.len() - 1]
-                                  .split(',')
-                                  .collect();
+            .split(',')
+            .collect();
 
         let xy0 = (isize::from_str(loc0[0]).unwrap(), isize::from_str(loc0[1]).unwrap());
         let xy1 = (isize::from_str(loc1[0]).unwrap(), isize::from_str(loc1[1]).unwrap());
@@ -163,7 +163,7 @@ pub fn fire_hazard_2(file: &str) -> u32 {
             for y in xy0.1..(xy1.1 + 1) {
                 let loc = Loc::new(x, y);
                 let light = lights.entry(loc)
-                                  .or_insert(Light::new(State::On, 0));
+                    .or_insert(Light::new(State::On, 0));
                 if toggle {
                     light.toggle_brightness();
                 } else {

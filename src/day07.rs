@@ -93,24 +93,24 @@ pub fn assembly_required(file: &str, override_address: &str, override_value: i32
     for line in reader.lines() {
         let line = line.unwrap();
         let tokens: Vec<Token> = line.split_whitespace()
-                                     .map(|s| {
-                                         match s {
-                                             "AND" => Token::Op(Operator::And),
-                                             "OR" => Token::Op(Operator::Or),
-                                             "LSHIFT" => Token::Op(Operator::LShift),
-                                             "RSHIFT" => Token::Op(Operator::RShift),
-                                             "NOT" => Token::Op(Operator::Not),
-                                             "->" => Token::Set,
-                                             _ => {
-                                                 let m = s.to_string();
-                                                 match m.parse::<i32>() {
-                                                     Ok(n) => Token::Mem(Register::Value(n)),
-                                                     Err(_) => Token::Mem(Register::Address(m)),
-                                                 }
-                                             }
-                                         }
-                                     })
-                                     .collect();
+            .map(|s| {
+                match s {
+                    "AND" => Token::Op(Operator::And),
+                    "OR" => Token::Op(Operator::Or),
+                    "LSHIFT" => Token::Op(Operator::LShift),
+                    "RSHIFT" => Token::Op(Operator::RShift),
+                    "NOT" => Token::Op(Operator::Not),
+                    "->" => Token::Set,
+                    _ => {
+                        let m = s.to_string();
+                        match m.parse::<i32>() {
+                            Ok(n) => Token::Mem(Register::Value(n)),
+                            Err(_) => Token::Mem(Register::Address(m)),
+                        }
+                    }
+                }
+            })
+            .collect();
 
         let mut operation = Operation::default();
 

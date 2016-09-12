@@ -40,7 +40,7 @@ pub fn sperical_houses_1(file: &str) -> usize {
     let mut input = File::open(file).expect("File open fail.");
     let mut buffer = String::new();
     input.read_to_string(&mut buffer)
-         .expect("File read fail.");
+        .expect("File read fail.");
     let mut houses = HashMap::new();
     let mut santa = Santa::new(0, 0);
     houses.insert(Location::new(santa.row, santa.col), 1);
@@ -60,7 +60,7 @@ pub fn sperical_houses_1(file: &str) -> usize {
             santa.col -= 1;
         }
         let counter = houses.entry(Location::new(santa.row, santa.col))
-                            .or_insert(0);
+            .or_insert(0);
         *counter += 1;
         //        println!("dir: {}, row: {}, col: {}, visits: {}",
         //                c, row, col, counter);
@@ -77,7 +77,7 @@ pub fn sperical_houses_2(file: &str) -> usize {
     let mut input = File::open(file).expect("File open fail.");
     let mut buffer = String::new();
     input.read_to_string(&mut buffer)
-         .expect("File read fail.");
+        .expect("File read fail.");
     let mut houses = HashMap::new();
 
     let santa = Santa::new(0, 0);
@@ -102,9 +102,9 @@ pub fn sperical_houses_2(file: &str) -> usize {
         if c == 'v' {
             santa_queue[current].col -= 1;
         }
-        let counter = houses.entry(Location::new(santa_queue[current].row,
-                                                 santa_queue[current].col))
-                            .or_insert(0);
+        let counter =
+            houses.entry(Location::new(santa_queue[current].row, santa_queue[current].col))
+                .or_insert(0);
         *counter += 1;
         current += 1;
         if current == 2 {

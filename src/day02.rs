@@ -6,7 +6,7 @@ pub fn no_math_1(file: &str) -> i32 {
     let mut input = File::open(file).expect("File open fail.");
     let mut buffer = String::new();
     input.read_to_string(&mut buffer)
-         .expect("File read fail.");
+        .expect("File read fail.");
     let mut total = 0;
     for line in buffer.lines() {
         let v: Vec<&str> = line.split('x').collect();
@@ -40,7 +40,7 @@ pub fn no_math_2(file: &str) -> i32 {
     let mut input = File::open(file).expect("File open fail.");
     let mut buffer = String::new();
     input.read_to_string(&mut buffer)
-         .expect("File read fail.");
+        .expect("File read fail.");
     let mut ribbon = 0;
     for line in buffer.lines() {
         let v: Vec<&str> = line.split('x').collect();
