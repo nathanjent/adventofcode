@@ -22,7 +22,7 @@ pub fn single_night(file: &str) -> i64 {
         nodes.push(from.clone());
         nodes.push(to.clone());
         edges.push((from.clone(), to.clone(), distance));
-        edges.push((to, from, distance)); // bi-directional
+        edges.push((to, from, distance)); // bi-directed
     }
     // remove duplicate nodes
     nodes.sort_by(|a, b| a.0.cmp(&b.0));
@@ -38,7 +38,7 @@ pub fn single_night(file: &str) -> i64 {
     let mut results = Vec::new();
     for n in node_list {
         // make n node source
-        let mut nodes = nodes.clone(); 
+        let mut nodes = nodes.clone();
         if let Ok(n_index) = nodes.binary_search(&n) {
             let mut node = nodes.get_mut(n_index).unwrap();
             *node = Node(n.0.clone(), 0);
@@ -84,9 +84,9 @@ fn dijkstra(mut nodes: Vec<Node>, edges: Vec<(Node, Node, i64)>) -> (Vec<Node>, 
         for edge in edges.clone().iter() {
             let (ref from, ref to, ref dist) = *edge;
             if from == &node {
-                if let Ok(neighbor_index) = nodes.binary_search(to) {
-                    let mut neighbor = nodes.get_mut(neighbor_index).unwrap();
+                if let Ok(neighbor_index) = nodes.binary_search_by(|n| n.0.cmp(&to.0)) {
                     println!("edge {:?} {:?} {:?}", from.0, to.0, dist);
+                    let mut neighbor = nodes.get_mut(neighbor_index).unwrap();
                     let alt = node.1 + *dist;
                     // assign new weight to neighbor
                     if alt < neighbor.1 {
