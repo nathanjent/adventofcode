@@ -71,6 +71,7 @@ fn dijkstra(mut nodes: Vec<Node>, edges: Vec<(Node, Node, i64)>) -> (Vec<Node>, 
             return (out, sum);
         }
         println!("sorted nodes");
+        // sort by value
         nodes.sort_by(|a, b| b.1.cmp(&a.1));
         for node in nodes.clone() {
             println!("{:?}", node);
@@ -79,6 +80,9 @@ fn dijkstra(mut nodes: Vec<Node>, edges: Vec<(Node, Node, i64)>) -> (Vec<Node>, 
         let node = nodes.pop().unwrap();
         println!("pop min {:?}", node);
         println!("edges length {:?}", edges.len());
+
+        // sort by name
+        nodes.sort_by(|a, b| a.0.cmp(&b.0));
 
         // for each neighbor of n
         for edge in edges.clone().iter() {
