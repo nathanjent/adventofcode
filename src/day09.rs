@@ -47,35 +47,22 @@ pub fn single_night(file: &str) -> i64 {
         results.push(dijkstra(nodes, edges.clone()));
     }
 
+    println!("results");
     for result in results.clone() {
-        let (route, _) = result;
-        for node in route {
-            println!("{:?}->", node);
-        }
+        println!("{}", result);
     }
-    // sort reversed and pop min
-    results.sort_by(|a, b| b.1.cmp(&a.1));
-    let (_, min) = results.pop().unwrap();
-    min
+    results.iter().cloned().min().unwrap()
 }
 
-fn dijkstra(mut nodes: Vec<Node>, edges: Vec<(Node, Node, i64)>) -> (Vec<Node>, i64) {
+fn dijkstra(mut nodes: Vec<Node>, edges: Vec<(Node, Node, i64)>) -> i64 {
     let mut out: Vec<Node> = Vec::new();
     loop {
         if nodes.is_empty() {
-            let mut sum = 0;
-            for node in out.clone() {
-                sum += node.1;
-                println!("{:?}", node);
-            }
-            return (out, sum);
+            break;
         }
         println!("\nsorted nodes");
-        // sort by value
+        // sort by value decreasing
         nodes.sort_by(|a, b| b.1.cmp(&a.1));
-        for node in nodes.clone() {
-            println!("{:?}", node);
-        }
 
         let node = nodes.pop().unwrap();
         println!("pop min {:?}", node);
@@ -90,6 +77,7 @@ fn dijkstra(mut nodes: Vec<Node>, edges: Vec<(Node, Node, i64)>) -> (Vec<Node>, 
                 if let Ok(neighbor_index) = nodes.binary_search_by(|n| n.0.cmp(&to.0)) {
                     println!("edge {:?} {:?} {:?}", from.0, to.0, dist);
                     let mut neighbor = nodes.get_mut(neighbor_index).unwrap();
+                    println!("neighbor {:?}", &neighbor);
                     let alt = node.1 + *dist;
                     // assign new weight to neighbor
                     if alt < neighbor.1 {
@@ -101,12 +89,13 @@ fn dijkstra(mut nodes: Vec<Node>, edges: Vec<(Node, Node, i64)>) -> (Vec<Node>, 
                 }
             }
         }
-        out.push(node);
-        print!("Out: ");
-        for node in out.clone() {
-            print!("{:?},", node);
-        }
+        out.push(node.clone());
     }
+    print!("Out: ");
+    for node in out.clone() {
+        print!("{:?},", node);
+    }
+    out.iter().fold(0, |acc, ref n| acc + n.1)
 }
 
 #[derive(Debug, Eq, Ord, PartialOrd)]
