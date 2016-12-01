@@ -8,6 +8,9 @@ use day07;
 use day08;
 use day09;
 
+use day01_2016;
+
+//2015
 #[test]
 fn day01test1() {
     assert_eq!(day01::not_quite_lisp_1("input/day01.txt"), 232);
@@ -96,4 +99,10 @@ fn day09test1() {
 #[test]
 fn day09test2() {
     assert_eq!(day09::single_night("input/day09.txt"), 0);
+}
+
+// 2016
+#[test]
+fn day01_2016test2() {
+    assert_eq!(day01_2016::taxicab("input/day01_2016.txt"), 0);
 }
