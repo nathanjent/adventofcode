@@ -8,17 +8,19 @@ pub fn taxicab(file: &str) -> i64 {
 
     let cur_dir = Direction::North;
 
-    for line in reader.lines() {
-        let line = line.unwrap();
-        println!("{}", line);
-
-        let words: Vec<&str> = line.split(", ").collect();
-        let mut prev_turn = Turn::None;
-        for word in words {
-            let op: Vec<&str> = word.split(char::is_numeric).collect();
-            println!("{} {}", op[0], op[1]);
-        }
-    }
+    reader.lines()
+        .filter_map(Result::ok)
+        .flat_map(|line| {
+            line.split(", ")
+        })
+        .filter_map(|word| {
+            if let Some(i) = word.find(char::is_numeric) {
+                Some(word.split_at(i))
+            } else {
+                None
+            }
+        })
+        .inspect(|op| println!("{:?}", op));
     64
 }
 
