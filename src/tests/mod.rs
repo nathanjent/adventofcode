@@ -103,6 +103,6 @@ fn day09test2() {
 
 // 2016
 #[test]
-fn day01_2016test2() {
+fn day01_2016test1() {
     assert_eq!(day01_2016::taxicab("input/day01_2016.txt"), 0);
 }
