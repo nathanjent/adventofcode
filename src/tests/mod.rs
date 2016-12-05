@@ -9,8 +9,9 @@ use day08;
 use day09;
 
 use day01_2016;
+use day02_2016;
 
-//2015
+// 2015
 #[test]
 fn day01test1() {
     assert_eq!(day01::not_quite_lisp_1("input/day01.txt"), 232);
@@ -104,5 +105,21 @@ fn day09test2() {
 // 2016
 #[test]
 fn day01_2016test1() {
-    assert_eq!(day01_2016::taxicab("input/day01_2016.txt"), 0);
+    assert_eq!(day01_2016::taxicab_1("input/day01_2016.txt"), 161);
+}
+
+#[test]
+fn day01_2016test2() {
+    assert_eq!(day01_2016::taxicab_2("input/day01_2016.txt"), 110);
+}
+
+#[test]
+fn day02_2016test1() {
+    assert_eq!(day02_2016::bathroom_security_1("input/day02_2016.txt"),
+               "95549");
+}
+
+#[test]
+fn day02_2016test2() {
+    assert_eq!(day02_2016::bathroom_security_2("input/day02_2016.txt"), "");
 }

@@ -78,7 +78,7 @@ fn dijkstra(mut nodes: Vec<Node>, edges: Vec<Edge>) -> i64 {
                     // assign new weight to neighbor
                     if alt < neighbor.distance {
                         println!("{:?} <- {:?}", neighbor.name, alt);
-                        //*neighbor = Node::new(b, alt);
+                        // *neighbor = Node::new(b, alt);
                     } else {
                         println!("{:?} - {:?}", neighbor.name, neighbor.distance);
                     }
@@ -108,14 +108,25 @@ struct Edge {
 }
 
 impl Node {
-    fn new<S>(name: S, distance: i64) -> Self where S: Into<String> {
-        Node { name: name.into(), distance: distance }
+    fn new<S>(name: S, distance: i64) -> Self
+        where S: Into<String>
+    {
+        Node {
+            name: name.into(),
+            distance: distance,
+        }
     }
 }
 
 impl Edge {
-    fn new<S>(a: S, b: S, len: i64) -> Self where S: Into<String> {
-        Edge { a: a.into(), b: b.into(), len: len }
+    fn new<S>(a: S, b: S, len: i64) -> Self
+        where S: Into<String>
+    {
+        Edge {
+            a: a.into(),
+            b: b.into(),
+            len: len,
+        }
     }
 }
 
@@ -130,13 +141,19 @@ impl PartialEq for Node {
 
 impl Clone for Node {
     fn clone(&self) -> Self {
-        Node { name: self.name.clone(), distance: self.distance }
+        Node {
+            name: self.name.clone(),
+            distance: self.distance,
+        }
     }
 }
 
 impl Clone for Edge {
     fn clone(&self) -> Self {
-        Edge { a: self.a.clone(), b: self.b.clone(), len: self.len }
+        Edge {
+            a: self.a.clone(),
+            b: self.b.clone(),
+            len: self.len,
+        }
     }
 }
-
