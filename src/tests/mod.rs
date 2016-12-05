@@ -11,6 +11,7 @@ use day09;
 use day01_2016;
 use day02_2016;
 use day03_2016;
+use day04_2016;
 
 // 2015
 #[test]
@@ -133,4 +134,14 @@ fn day03_2016test1() {
 #[test]
 fn day03_2016test2() {
     assert_eq!(day03_2016::square_triangles_2("input/day03_2016.txt"), 1577);
+}
+
+#[test]
+fn day04_2016test1() {
+    assert_eq!(day04_2016::obsecurity_1("input/day04_2016.txt"), 0);
+}
+
+#[test]
+fn day04_2016test2() {
+    assert_eq!(day04_2016::obsecurity_2("input/day04_2016.txt"), 0);
 }
