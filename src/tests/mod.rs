@@ -132,5 +132,5 @@ fn day03_2016test1() {
 
 #[test]
 fn day03_2016test2() {
-    assert_eq!(day03_2016::square_triangles_2("input/day03_2016.txt"), 0);
+    assert_eq!(day03_2016::square_triangles_2("input/day03_2016.txt"), 1577);
 }
