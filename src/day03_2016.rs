@@ -44,38 +44,37 @@ pub fn square_triangles_2(file: &str) -> usize {
         .filter_map(Result::ok)
         .map(|line| {
             line.split_whitespace()
-            .filter_map(|side| {
-                side.parse::<i32>().ok()
-            })
-            .collect::<Vec<i32>>()
+                .filter_map(|side| side.parse::<i32>().ok())
+                .collect::<Vec<i32>>()
         });
-        let mut rotated = Vec::new();
+    let mut rotated = Vec::new();
     loop {
-      if let Some(top) = triple_iter.next() {
-          if let Some(middle) = triple_iter.next() {
-              if let Some(bottom) = triple_iter.next() {
-                  let mut left = vec![top[0], middle[0], bottom[0]];
-                  let mut center = vec![top[1], middle[1], bottom[1]];
-                  let mut right = vec![top[2], middle[2], bottom[2]];
-                  left.sort();
-                  center.sort();
-                  right.sort();
-                  rotated.push(left);
-                  rotated.push(center);
-                  rotated.push(right);
-              } else {
-                  break;
-              }
-          } else {
-              break;
-          }
-      } else {
-          break;
-      }
+        if let Some(top) = triple_iter.next() {
+            if let Some(middle) = triple_iter.next() {
+                if let Some(bottom) = triple_iter.next() {
+                    let mut left = vec![top[0], middle[0], bottom[0]];
+                    let mut center = vec![top[1], middle[1], bottom[1]];
+                    let mut right = vec![top[2], middle[2], bottom[2]];
+                    left.sort();
+                    center.sort();
+                    right.sort();
+                    rotated.push(left);
+                    rotated.push(center);
+                    rotated.push(right);
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
     }
 
 
-    rotated.iter().filter_map(|t| {
+    rotated.iter()
+        .filter_map(|t| {
             let a = t[0];
             let b = t[1];
             let c = t[2];

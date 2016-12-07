@@ -54,8 +54,8 @@ fn parse_keypass(file: &str, keypad: &mut Keypad) -> Vec<i32> {
             //.inspect(|op| println!("{:?}", op))
             .collect::<Vec<char>>();
         for instruction in instructions {
-            //println!("IN: {:?}", keypad);
-            //println!("{:?}", instruction);
+            // println!("IN: {:?}", keypad);
+            // println!("{:?}", instruction);
             match instruction {
                 'U' => keypad.up(),
                 'D' => keypad.down(),
@@ -63,7 +63,7 @@ fn parse_keypass(file: &str, keypad: &mut Keypad) -> Vec<i32> {
                 'R' => keypad.right(),
                 _ => {}
             }
-            //println!("OUT: {:?}", keypad);
+            // println!("OUT: {:?}", keypad);
         }
         passkey.push(keypad.get_current());
     }
@@ -94,7 +94,7 @@ impl Keypad {
             let i = row * self.width as isize + self.col;
             if self.keys[i as usize] != 0x0 {
                 self.row -= 1;
-//                println!("{:?}", self.get_current());
+                //                println!("{:?}", self.get_current());
             }
         }
     }
@@ -106,7 +106,7 @@ impl Keypad {
             let i = row * self.width as isize + self.col;
             if self.keys[i as usize] != 0x0 {
                 self.row += 1;
-//                println!("{:?}", self.get_current());
+                //                println!("{:?}", self.get_current());
             }
         }
     }
@@ -117,7 +117,7 @@ impl Keypad {
             let i = self.row * self.width as isize + col;
             if self.keys[i as usize] != 0x0 {
                 self.col -= 1;
-//                println!("{:?}", self.get_current());
+                //                println!("{:?}", self.get_current());
             }
         }
     }
@@ -128,7 +128,7 @@ impl Keypad {
             let i = self.row * self.width as isize + col;
             if self.keys[i as usize] != 0x0 {
                 self.col += 1;
-//                println!("{:?}", self.get_current());
+                //                println!("{:?}", self.get_current());
             }
         }
     }

@@ -30,29 +30,30 @@ fn parse_rooms(file: &str) -> usize {
                     .split("")
                     .flat_map(str::chars)
                     .collect::<Vec<char>>();
-                //println!("{}", id);
-                //println!("{:?}", checksum);
+                // println!("{}", id);
+                // println!("{:?}", checksum);
 
                 let letters = words.iter().flat_map(|s| s.chars()).collect::<Vec<char>>();
-                //println!("{:?}", letters);
+                // println!("{:?}", letters);
 
                 let mut counts = BTreeMap::new();
                 for c in letters.iter() {
                     *counts.entry(*c).or_insert(0) += 1;
                 }
-                //println!("{:?}", counts);
+                // println!("{:?}", counts);
 
                 let mut stack = counts.iter().collect::<Vec<(&char, &usize)>>();
                 // sort high to low
                 stack.sort_by(|a, b| b.1.cmp(a.1));
-                //println!("{:?}", stack);
+                // println!("{:?}", stack);
 
                 let (checkedsum_full, _): (Vec<&char>, Vec<&usize>) = stack.iter().cloned().unzip();
-                let checkedsum = checkedsum_full[..5].iter()
+                let checkedsum = checkedsum_full[..5]
+                    .iter()
                     .cloned()
                     .cloned()
                     .collect::<Vec<char>>();
-                //println!("{:?}", checkedsum);
+                // println!("{:?}", checkedsum);
 
                 if let Ok(id) = id.parse::<usize>() {
                     if checksum == checkedsum {
@@ -61,7 +62,7 @@ fn parse_rooms(file: &str) -> usize {
                 }
             }
         };
-        //println!("");
+        // println!("");
     }
     sum
 }
