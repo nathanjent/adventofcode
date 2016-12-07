@@ -138,7 +138,7 @@ fn day03_2016test2() {
 
 #[test]
 fn day04_2016test1() {
-    assert_eq!(day04_2016::obsecurity_1("input/day04_2016.txt"), 0);
+    assert_eq!(day04_2016::obsecurity_1("input/day04_2016.txt"), 185371);
 }
 
 #[test]
