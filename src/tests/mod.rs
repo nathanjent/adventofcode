@@ -143,5 +143,5 @@ fn day04_2016test1() {
 
 #[test]
 fn day04_2016test2() {
-    assert_eq!(day04_2016::obsecurity_2("input/day04_2016.txt"), 0);
+    assert_eq!(day04_2016::obsecurity_2("input/day04_2016.txt", "northpole object"), 984);
 }

@@ -4,14 +4,44 @@ use std::io::BufReader;
 use std::collections::BTreeMap;
 
 pub fn obsecurity_1(file: &str) -> usize {
-    parse_rooms(file)
+    let (sum, _) = parse_rooms(file);
+    sum
 }
 
-pub fn obsecurity_2(file: &str) -> usize {
-    parse_rooms(file)
+pub fn obsecurity_2(file: &str, room_search_term: &str) -> usize {
+    let (_, rooms) = parse_rooms(file);
+    let mut names = Vec::new();
+    for room in rooms {
+        let mut words = Vec::new();
+        for word in room.encrypted {
+            let mut shifted = Vec::new();
+            for c in word.chars() {
+                let mut c = c as u8;
+                let shift = (room.id % 26) as u8;
+                c = c + shift;
+                if c > 'z' as u8 {
+                    c = 'a' as u8 - 1 + (c - 'z' as u8);
+                }
+                shifted.push(c as char);
+            }
+            words.push(shifted.iter().cloned().collect::<String>());
+        }
+        let name = words.into_iter()
+                   .map(|mut s| {
+                       s.push(' ');
+                       s
+                   })
+                   .collect::<String>();
+        if name.find(room_search_term).is_some() {
+            return room.id;
+        }
+        names.push(name);
+    }
+    println!("{:?}", names);
+    42
 }
 
-fn parse_rooms(file: &str) -> usize {
+fn parse_rooms(file: &str) -> (usize, Vec<Room>) {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -19,6 +49,7 @@ fn parse_rooms(file: &str) -> usize {
         .filter_map(Result::ok)
         .collect();
 
+    let mut rooms = Vec::new();
     let mut sum = 0;
     for line in lines {
         let mut words = line.split("-").collect::<Vec<&str>>();
@@ -57,6 +88,10 @@ fn parse_rooms(file: &str) -> usize {
 
                 if let Ok(id) = id.parse::<usize>() {
                     if checksum == checkedsum {
+                        // Collect verified rooms
+                        rooms.push(Room {
+                            id: id,
+                            encrypted: words.iter().map(|s| s.to_string()).collect::<Vec<String>>() });
                         sum += id;
                     }
                 }
@@ -64,5 +99,10 @@ fn parse_rooms(file: &str) -> usize {
         };
         // println!("");
     }
-    sum
+    (sum, rooms)
+}
+
+struct Room {
+    encrypted: Vec<String>,
+    id: usize,
 }
