@@ -12,6 +12,7 @@ use day01_2016;
 use day02_2016;
 use day03_2016;
 use day04_2016;
+use day06_2016;
 
 // 2015
 #[test]
@@ -144,4 +145,14 @@ fn day04_2016test1() {
 #[test]
 fn day04_2016test2() {
     assert_eq!(day04_2016::obsecurity_2("input/day04_2016.txt", "northpole object"), 984);
+}
+
+#[test]
+fn day06_2016test1() {
+    assert_eq!(day06_2016::noisy_signals_1("input/day06_2016.txt"), "tkspfjcc".to_string());
+}
+
+#[test]
+fn day06_2016test2() {
+    assert_eq!(day06_2016::noisy_signals_2("input/day06_2016.txt"), 0);
 }
