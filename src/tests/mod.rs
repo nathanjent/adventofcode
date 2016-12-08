@@ -154,5 +154,5 @@ fn day06_2016test1() {
 
 #[test]
 fn day06_2016test2() {
-    assert_eq!(day06_2016::noisy_signals_2("input/day06_2016.txt"), 0);
+    assert_eq!(day06_2016::noisy_signals_2("input/day06_2016.txt"), "xrlmbypn".to_string());
 }

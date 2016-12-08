@@ -4,15 +4,14 @@ use std::io::BufReader;
 use std::collections::BTreeMap;
 
 pub fn noisy_signals_1(file: &str) -> String {
-    parse(file)
+    parse(file, 0)
 }
 
-pub fn noisy_signals_2(file: &str) -> usize {
-    parse(file);
-    42
+pub fn noisy_signals_2(file: &str) -> String {
+    parse(file, -1)
 }
 
-fn parse(file: &str) -> String {
+fn parse(file: &str, order_idx: i32) -> String {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -48,7 +47,15 @@ fn parse(file: &str) -> String {
         stack.sort_by(|a, b| b.1.cmp(&a.1));
         //println!("{:?}", stack);
         let (sorted_letters, _): (Vec<String>, Vec<usize>) = stack.iter().cloned().unzip();
-        message.push_str(&*sorted_letters[0]);
+        //println!("{:?}", sorted_letters);
+        if order_idx < 0 {
+            let order_idx = (-order_idx) as usize;
+            if order_idx < sorted_letters.len() {
+                message.push_str(&*sorted_letters[sorted_letters.len() - order_idx]);
+            }
+        } else {
+            message.push_str(&*sorted_letters[order_idx as usize]);
+        }
     }
     //println!("{:?}", message);
     message
