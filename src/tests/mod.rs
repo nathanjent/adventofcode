@@ -12,6 +12,7 @@ use day01_2016;
 use day02_2016;
 use day03_2016;
 use day04_2016;
+use day05_2016;
 
 // 2015
 #[test]
@@ -144,4 +145,14 @@ fn day04_2016test1() {
 #[test]
 fn day04_2016test2() {
     assert_eq!(day04_2016::obsecurity_2("input/day04_2016.txt", "northpole object"), 984);
+}
+
+#[test]
+fn day05_2016test1() {
+    assert_eq!(day05_2016::chess_1("input/day05_2016.txt", 8), "2414bc77".to_string());
+}
+
+#[test]
+fn day05_2016test2() {
+    assert_eq!(day05_2016::chess_2("input/day05_2016.txt", 12), "".to_string());
 }
