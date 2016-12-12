@@ -14,6 +14,7 @@ use day03_2016;
 use day04_2016;
 use day05_2016;
 use day06_2016;
+use day07_2016;
 
 // 2015
 #[test]
@@ -166,4 +167,14 @@ fn day06_2016test1() {
 #[test]
 fn day06_2016test2() {
     assert_eq!(day06_2016::noisy_signals_2("input/day06_2016.txt"), "xrlmbypn".to_string());
+}
+
+#[test]
+fn day07_2016test1() {
+    assert_eq!(day07_2016::ip_7_1("input/day07_2016.txt"), 0);
+}
+
+#[test]
+fn day07_2016test2() {
+    assert_eq!(day07_2016::ip_7_2("input/day07_2016.txt"), 0);
 }

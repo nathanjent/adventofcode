@@ -17,5 +17,6 @@ pub mod day03_2016;
 pub mod day04_2016;
 pub mod day05_2016;
 pub mod day06_2016;
+pub mod day07_2016;
 
 #[cfg(test)]mod tests;
