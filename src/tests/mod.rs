@@ -151,12 +151,12 @@ fn day04_2016test2() {
 
 #[test]
 fn day05_2016test1() {
-    assert_eq!(day05_2016::chess_1("input/day05_2016.txt", 8), "2414bc77".to_string());
+    assert_eq!(day05_2016::chess_1("input/day05_2016.txt"), "2414bc77".to_string());
 }
 
 #[test]
 fn day05_2016test2() {
-    assert_eq!(day05_2016::chess_2("input/day05_2016.txt", 12), "".to_string());
+    assert_eq!(day05_2016::chess_2("input/day05_2016.txt"), "".to_string());
 }
 
 #[test]
