@@ -15,6 +15,7 @@ use day04_2016;
 use day05_2016;
 use day06_2016;
 use day07_2016;
+use day08_2016;
 
 // 2015
 #[test]
@@ -156,7 +157,7 @@ fn day05_2016test1() {
 
 #[test]
 fn day05_2016test2() {
-    assert_eq!(day05_2016::chess_2("input/day05_2016.txt"), "".to_string());
+    assert_eq!(day05_2016::chess_2("input/day05_2016.txt"), "437e60fc".to_string());
 }
 
 #[test]
@@ -177,4 +178,14 @@ fn day07_2016test1() {
 #[test]
 fn day07_2016test2() {
     assert_eq!(day07_2016::ip_7_2("input/day07_2016.txt"), 0);
+}
+
+#[test]
+fn day08_2016test1() {
+    assert_eq!(day08_2016::two_factor_1("input/day08_2016.txt"), 0);
+}
+
+#[test]
+fn day08_2016test2() {
+    assert_eq!(day08_2016::two_factor_2("input/day08_2016.txt"), 0);
 }

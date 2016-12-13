@@ -54,7 +54,9 @@ pub fn chess_2(file: &str) -> String {
     })
     {
         let (i, c) = indexed_letter;
-        password[i] = c;
+        if password[i] == '_' {
+            password[i] = c;
+        }
         let mut pass_filled = true;
         println!("{:?}", password);
         for l in password.iter().cloned() {
