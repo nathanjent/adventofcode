@@ -23,25 +23,24 @@ fn count_pixels(file: &str) -> usize {
         let terms = line.split_whitespace().collect::<Vec<&str>>();
         match terms[0] {
             "rect" => {
-                //FIXME the terms need split correctly
-                let cs = terms[1].split(|c| !c.is_digit())
-                    .filter(char::is_digit)
-                    .collect::<Vec<char>>();
+                let cs = terms[1].split('x')
+                    .collect::<Vec<&str>>();
                 let a = cs[0].parse::<usize>().unwrap_or(0);
-                let b = cs[2].parse::<usize>().unwrap_or(0);
+                let b = cs[1].parse::<usize>().unwrap_or(0);
                 Some(Operation::Rect(a, b))
             },
             "rotate" => {
-                //FIXME the terms need split correctly
                 let axis = match terms[1] {
                     "row" => Axis::Row,
                     "column" => Axis::Column,
                     _ => Axis::Row,
                 };
-                let a = terms[2].split(|c| !c.is_digit())
-                    .filter(char::is_digit)
-                    .collect::<String>()
-                    .parse::<usize>().unwrap_or(0);
+                let a = terms[2].split('=')
+                    .filter_map(|s| {
+                        s.parse::<usize>().ok()
+                    })
+                .last()
+                    .unwrap_or(0);
                 let b = terms[4].parse::<usize>().unwrap_or(0);
                 Some(Operation::Rotate(axis, a, b))
             },
@@ -74,7 +73,8 @@ fn count_pixels(file: &str) -> usize {
                 match axis {
                     Axis::Row => {
                         for _ in 0..(b % screen.width) {
-                            for x in 0..screen.width {
+                            //FIXME not correct range syntax
+                            for x in screen.width..0 {
                                 let curr_location = Location {
                                     x: x,
                                     y: a,
@@ -95,18 +95,22 @@ fn count_pixels(file: &str) -> usize {
                                     .cloned();
                                 match prev_pixel {
                                     Some(p) => {
+                                        println!("Pixel {}", p);
                                         screen_map.insert(curr_location, p);
                                     },
                                     None => {
                                         screen_map.insert(curr_location, 0);
                                     },
                                 }
+                                print_screen(&screen, &screen_map);
+                                println!("");
                             }
                         }
                     },
                     Axis::Column => {
                         for _ in 0..(b % screen.height) {
-                            for y in 0..screen.height {
+                            //FIXME not correct range syntax
+                            for y in screen.height..0 {
                                 let curr_location = Location {
                                     x: a,
                                     y: y,
@@ -133,23 +137,35 @@ fn count_pixels(file: &str) -> usize {
                                         screen_map.insert(curr_location, 0);
                                     },
                                 }
+                                print_screen(&screen, &screen_map);
+                                println!("");
                             }
                         }
                     },
                 }
             },
         }
+        print_screen(&screen, &screen_map);
+        println!("");
     }
     //println!("{:?}", screen_map);
-    let mut screen_array = vec![vec![0; screen.width]; screen.height];
-    for (key, val) in screen_map.iter() {
-        screen_array[key.x][key.y] = *val;
-    }
-    for i in 0..screen.height {
-        for j in 0..screen.width {
-            print!("{}", screen_array[i % screen.height][j % screen.width]);
+
+    fn print_screen(screen: &Screen, screen_map: &HashMap<Location, usize>) {
+        let mut output = vec![vec!['.';screen.width];screen.height];
+        for (loc, status) in screen_map.iter() {
+            if *status == 1 {
+                output[loc.y % screen.height][loc.x % screen.width] = '#';
+            }
+        }
+        for row in 0..screen.height {
+            for col in 0..screen.width {
+                print!("{}", output[row][col]);
+            }
+            println!("");
         }
     }
+
+    print_screen(&screen, &screen_map);
     screen_map.iter()
         .filter(|e| {
             let (_, state) = *e;
