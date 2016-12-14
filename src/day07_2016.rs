@@ -49,8 +49,8 @@ fn count_ips(file: &str) -> usize {
                     if let Some(b) = s.pop() {
                         if let Some(a) = s.pop() {
                             let abba_found = a == d && b == c && a != b;
-                            println!("[{}{}{}{}] {}", a, b, c, d, abba_found);
                             if abba_found {
+                                println!("[{}{}{}{}] {}", a, b, c, d, abba_found);
                                 valid = false;
                                 break 'inner;
                             }
@@ -65,6 +65,7 @@ fn count_ips(file: &str) -> usize {
 
         let mut abba_count = 0;
         let mut s = outer.iter().flat_map(|s| s.chars()).collect::<String>();
+        //for mut s in outer {
         println!("outer: {}", s);
         while let Some(d) = s.pop() {
             if let Some(c) = s.pop() {
@@ -82,6 +83,7 @@ fn count_ips(file: &str) -> usize {
                 s.push(c);
             }
         }
+        //}
 
         if valid && abba_count > 0 {
             println!("TLS Supported!");
