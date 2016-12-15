@@ -16,6 +16,7 @@ use day05_2016;
 use day06_2016;
 use day07_2016;
 use day08_2016;
+use day09_2016;
 
 // 2015
 #[test]
@@ -193,4 +194,19 @@ fn day08_2016test1() {
 #[test]
 fn day08_2016test2() {
     assert_eq!(day08_2016::two_factor_2("input/day08_2016.txt", 50, 6), 0);
+}
+
+#[test]
+fn day09_2016test_base() {
+    assert_eq!(day09_2016::explosives_1("input/day09_2016_base.txt"), 57);
+}
+
+#[test]
+fn day09_2016test1() {
+    assert_eq!(day09_2016::explosives_1("input/day09_2016.txt"), 0);
+}
+
+#[test]
+fn day09_2016test2() {
+    assert_eq!(day09_2016::explosives_2("input/day09_2016.txt"), 0);
 }
