@@ -181,11 +181,16 @@ fn day07_2016test2() {
 }
 
 #[test]
+fn day08_2016test_base() {
+    assert_eq!(day08_2016::two_factor_1("input/day08_2016_base.txt", 7, 3), 6);
+}
+
+#[test]
 fn day08_2016test1() {
-    assert_eq!(day08_2016::two_factor_1("input/day08_2016.txt"), 0);
+    assert_eq!(day08_2016::two_factor_1("input/day08_2016.txt", 50, 6), 0);
 }
 
 #[test]
 fn day08_2016test2() {
-    assert_eq!(day08_2016::two_factor_2("input/day08_2016.txt"), 0);
+    assert_eq!(day08_2016::two_factor_2("input/day08_2016.txt", 50, 6), 0);
 }

@@ -3,17 +3,19 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::collections::HashMap;
 
-pub fn two_factor_1(file: &str) -> usize {
-    count_pixels(file)
+pub fn two_factor_1(file: &str, w: usize, h: usize) -> usize {
+    let screen = Screen { width: w, height: h };
+    count_pixels(file, screen)
 }
 
-pub fn two_factor_2(file: &str) -> usize {
-    count_pixels(file)
+pub fn two_factor_2(file: &str, w: usize, h: usize) -> usize {
+    let screen = Screen { width: w, height: h };
+    count_pixels(file, screen)
 }
 
-fn count_pixels(file: &str) -> usize {
-    let ininsert = File::open(file).expect("File open fail.");
-    let reader = BufReader::new(ininsert);
+fn count_pixels(file: &str, screen: Screen) -> usize {
+    let input = File::open(file).expect("File open fail.");
+    let reader = BufReader::new(input);
 
     let lines: Vec<String> = reader.lines()
         .filter_map(Result::ok)
@@ -51,7 +53,6 @@ fn count_pixels(file: &str) -> usize {
 
     //println!("{:?}", operations);
 
-    let screen = Screen { width: 50, height: 6 };
     let mut screen_map = HashMap::new();
     for operation in operations {
         match operation {
@@ -63,7 +64,7 @@ fn count_pixels(file: &str) -> usize {
                                 x: x % screen.width,
                                 y: y % screen.height,
                             };
-                        println!("{}, {}", loc.x, loc.y);
+                        //println!("{}, {}", loc.x, loc.y);
                         screen_map.insert(loc, 1);
                     }
                 }
@@ -72,63 +73,65 @@ fn count_pixels(file: &str) -> usize {
                 println!("Rotate({:?}, {}, {})", axis, a, b);
                 match axis {
                     Axis::Row => {
+                        let row = a;
                         for _ in 0..(b % screen.width) {
-                            //FIXME not correct range syntax
-                            for x in screen.width..0 {
+                            let last_location = Location {
+                                x: screen.width - 1,
+                                y: row,
+                            };
+                            let last_pixel = screen_map.get(&last_location).cloned();
+                            for x in (0..screen.width).rev() {
                                 let curr_location = Location {
                                     x: x,
-                                    y: a,
+                                    y: row,
                                 };
-                                let prev_location;
+                                let prev_pixel;
                                 if x == 0 {
-                                    prev_location = Location {
-                                        x: screen.width - 1,
-                                        y: a,
-                                    };
+                                    prev_pixel = last_pixel;
                                 } else {
-                                    prev_location = Location {
+                                    let prev_location = Location {
                                         x: x - 1,
-                                        y: a,
+                                        y: row,
                                     };
+                                    prev_pixel = screen_map.get(&prev_location)
+                                        .cloned();
                                 }
-                                let prev_pixel = screen_map.get(&prev_location)
-                                    .cloned();
                                 match prev_pixel {
                                     Some(p) => {
-                                        println!("Pixel {}", p);
                                         screen_map.insert(curr_location, p);
                                     },
                                     None => {
                                         screen_map.insert(curr_location, 0);
                                     },
                                 }
-                                print_screen(&screen, &screen_map);
-                                println!("");
                             }
+                            //print_screen(&screen, &screen_map);
                         }
                     },
                     Axis::Column => {
+                        let col = a;
                         for _ in 0..(b % screen.height) {
-                            //FIXME not correct range syntax
-                            for y in screen.height..0 {
+                            let last_location = Location {
+                                x: col,
+                                y: screen.height - 1,
+                            };
+                            let last_pixel = screen_map.get(&last_location).cloned();
+                            for y in (0..screen.height).rev() {
                                 let curr_location = Location {
-                                    x: a,
+                                    x: col,
                                     y: y,
                                 };
-                                let prev_location;
+                                let prev_pixel;
                                 if y == 0 {
-                                    prev_location = Location {
-                                        x: a,
-                                        y: screen.width - 1,
-                                    };
+                                    prev_pixel = last_pixel;
                                 } else {
-                                    prev_location = Location {
-                                        x: a,
+                                    let prev_location = Location {
+                                        x: col,
                                         y: y - 1,
                                     };
+                                    prev_pixel = screen_map.get(&prev_location)
+                                        .cloned();
                                 }
-                                let prev_pixel = screen_map.get(&prev_location)
-                                    .cloned();
                                 match prev_pixel {
                                     Some(p) => {
                                         screen_map.insert(curr_location, p);
@@ -137,9 +140,9 @@ fn count_pixels(file: &str) -> usize {
                                         screen_map.insert(curr_location, 0);
                                     },
                                 }
-                                print_screen(&screen, &screen_map);
-                                println!("");
                             }
+                            //print_screen(&screen, &screen_map);
+                            //println!("");
                         }
                     },
                 }
