@@ -18,7 +18,8 @@ fn decompress(file: &str) -> usize {
         .filter_map(Result::ok)
         .collect();
 
-    let mut out = String::new();
+    //let mut out = String::new();
+    let mut count = 0;
     for line in lines {
         let mut cs = line.chars().peekable();
         loop {
@@ -55,7 +56,8 @@ fn decompress(file: &str) -> usize {
                                 }
                             }
                             for _ in 0..(marker[1]) {
-                                out.push_str(&*sequence);
+                                //out.push_str(&*sequence);
+                                count += sequence.len();
                             }
                             //println!("({}x{}){}", marker[0], marker[1], sequence);
                         }
@@ -63,7 +65,8 @@ fn decompress(file: &str) -> usize {
                         //println!("");
                     },
                     _ => {
-                        out.push(c);
+                        count += 1;
+                        //out.push(c);
                     },
                 }
             } else {
@@ -73,5 +76,6 @@ fn decompress(file: &str) -> usize {
     }
 
     //println!("{}", out);
-    out.chars().count()
+    //out.chars().count();
+    count
 }
