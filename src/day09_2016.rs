@@ -26,14 +26,23 @@ fn decompress(file: &str) -> usize {
                 match c {
                     '(' => {
                         let mut marker = Vec::new();
+                        let mut num = String::new();
+                        // collect digits from both sides of x then parse
                         loop {
                             if let Some(l) = cs.next() {
                                 if l == ')' {
+                                    if let Ok(d) = num.parse::<usize>() {
+                                        marker.push(d);
+                                    }
                                     break;
                                 }
                                 if l.is_digit(10) {
-                                    if let Some(d) = l.to_digit(10) {
+                                    num.push(l);
+                                }
+                                if l == 'x' {
+                                    if let Ok(d) = num.parse::<usize>() {
                                         marker.push(d);
+                                        num = String::new();
                                     }
                                 }
                             }
@@ -48,7 +57,10 @@ fn decompress(file: &str) -> usize {
                             for _ in 0..(marker[1]) {
                                 out.push_str(&*sequence);
                             }
+                            //println!("({}x{}){}", marker[0], marker[1], sequence);
                         }
+                        //println!("{}", out);
+                        //println!("");
                     },
                     _ => {
                         out.push(c);
@@ -60,6 +72,6 @@ fn decompress(file: &str) -> usize {
         }
     }
 
-    println!("{}", out);
+    //println!("{}", out);
     out.chars().count()
 }

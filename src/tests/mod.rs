@@ -203,7 +203,7 @@ fn day09_2016test_base() {
 
 #[test]
 fn day09_2016test1() {
-    assert_eq!(day09_2016::explosives_1("input/day09_2016.txt"), 0);
+    assert_eq!(day09_2016::explosives_1("input/day09_2016.txt"), 74532);
 }
 
 #[test]
