@@ -17,6 +17,7 @@ use day06_2016;
 use day07_2016;
 use day08_2016;
 use day09_2016;
+use day11_2016;
 
 // 2015
 #[test]
@@ -214,4 +215,14 @@ fn day09_2016test1() {
 #[test]
 fn day09_2016test2() {
     assert_eq!(day09_2016::explosives_2("input/day09_2016.txt"), 11558231665);
+}
+
+#[test]
+fn day11_2016test1() {
+    assert_eq!(day11_2016::rtg_1("input/day11_2016.txt"), 0);
+}
+
+#[test]
+fn day11_2016test2() {
+    assert_eq!(day11_2016::rtg_2("input/day11_2016.txt"), 0);
 }
