@@ -197,8 +197,13 @@ fn day08_2016test2() {
 }
 
 #[test]
-fn day09_2016test_base() {
+fn day09_2016test_base1() {
     assert_eq!(day09_2016::explosives_1("input/day09_2016_base.txt"), 57);
+}
+
+#[test]
+fn day09_2016test_base2() {
+    assert_eq!(day09_2016::explosives_2("input/day09_2016_base2.txt"), 242394);
 }
 
 #[test]
@@ -208,5 +213,5 @@ fn day09_2016test1() {
 
 #[test]
 fn day09_2016test2() {
-    assert_eq!(day09_2016::explosives_2("input/day09_2016.txt"), 0);
+    assert_eq!(day09_2016::explosives_2("input/day09_2016.txt"), 11558231665);
 }
