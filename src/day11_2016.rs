@@ -72,21 +72,25 @@ fn process(file: &str) -> usize {
             state.insert(f, floor_inventory);
         }
     }
-    println!("{:?}", state);
 
     if let Some(top_floor) = state.iter().map(|s| {
         let (f, _): (&usize, &Vec<Entity>) = s;
         *f
     }).max() {
-        let elevator = Elevator {
-            a: None,
-            b: None,
+        let mut elevator = Elevator {
+            holding: (None, None),
             current_floor: 1,
             top_floor: top_floor,
         };
+        println!("{:?}", elevator);
 
         loop {
-            if true {
+            elevator.inc_floor();
+            for entity in state.entry(elevator.current_floor).or_insert(Vec::new()) {
+                println!("{:?}", entity);
+            }
+            println!("{:?}", state);
+            if state.entry(4).or_insert(Vec::new()).len() == 4 {
                 break;
             }
         }
@@ -101,14 +105,14 @@ enum Entity<'e> {
     Microchip(&'e str),
 }
 
-struct Elevator {
-    a: Option<usize>,
-    b: Option<usize>,
+#[derive(Debug)]
+struct Elevator<'e> {
+    holding: (Option<Entity<'e>>, Option<Entity<'e>>),
     current_floor: usize,
     top_floor: usize,
 }
 
-impl Elevator {
+impl<'e> Elevator<'e> {
     fn inc_floor(&mut self) {
         if self.current_floor < self.top_floor {
             self.current_floor += 1;
@@ -118,6 +122,15 @@ impl Elevator {
     fn dec_floor(&mut self) {
         if self.current_floor > 0 {
             self.current_floor -= 1;
+        }
+    }
+
+    fn hold_item(&mut self, e: &'e Entity) {
+        let (ref mut left, ref mut right) = self.holding;
+        if !left.is_some() {
+            *left = Some(e).cloned();
+        } else if !right.is_some() {
+            *right = Some(e).cloned();
         }
     }
 }
