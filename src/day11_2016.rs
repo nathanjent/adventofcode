@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::collections::HashMap;
+use std::collections::{VecDeque, HashMap};
 
 pub fn rtg_1(file: &str) -> usize {
     process(file)
@@ -20,6 +20,7 @@ fn process(file: &str) -> usize {
         .collect();
 
     let mut state = HashMap::new();
+    let mut non_floor_entity_count = 0;
     for tokens in lines.iter().map(|line| {
         let mut words = line.split_whitespace().rev();
         let mut tokens = Vec::new();
@@ -42,13 +43,15 @@ fn process(file: &str) -> usize {
                         if let Some(m) = words.next() {
                             if let Some(i) = m.find('-') {
                                 let (compatibility, _) = m.split_at(i);
-                                tokens.push(Entity::Microchip(compatibility))
+                                tokens.push(Entity::Microchip(compatibility));
+                                non_floor_entity_count += 1;
                             }
                         }
                     },
                     "generator" => {
                         if let Some(g) = words.next() {
-                            tokens.push(Entity::Generator(g))
+                            tokens.push(Entity::Generator(g));
+                            non_floor_entity_count += 1;
                         }
                     },
                     _ => {},
@@ -61,11 +64,11 @@ fn process(file: &str) -> usize {
     })
     {
         let mut floor_id = None;
-        let mut floor_inventory = Vec::new();
+        let mut floor_inventory = VecDeque::new();
         for token in tokens {
             match token {
                 Entity::Floor(n) => floor_id = Some(n),
-                e @ _ => floor_inventory.push(e),
+                e @ _ => floor_inventory.push_back(e),
             }
         }
         if let Some(f) = floor_id {
@@ -74,7 +77,7 @@ fn process(file: &str) -> usize {
     }
 
     if let Some(top_floor) = state.iter().map(|s| {
-        let (f, _): (&usize, &Vec<Entity>) = s;
+        let (f, _): (&usize, &VecDeque<Entity>) = s;
         *f
     }).max() {
         let mut elevator = Elevator {
@@ -85,12 +88,30 @@ fn process(file: &str) -> usize {
         println!("{:?}", elevator);
 
         loop {
-            elevator.inc_floor();
-            for entity in state.entry(elevator.current_floor).or_insert(Vec::new()) {
-                println!("{:?}", entity);
+            {
+                let inventory = state.entry(elevator.current_floor).or_insert(VecDeque::new());
+                println!("Floor {}: {:?}", elevator.current_floor, inventory);
+                if let Some(item_a) = elevator.unload_left() {
+                    inventory.push_back(item_a);
+                }
+                if let Some(item_b) = elevator.unload_right() {
+                    inventory.push_back(item_b);
+                }
+                loop {
+                    if let Some(item) = inventory.pop_front() {
+                        elevator.load_item(item);
+                        if elevator.is_full() {
+                            break;
+                        }
+                    } else {
+                        panic!("the elevator will only function if it contains at least one RTG or microchip");
+                    }
+                }
+
+                elevator.inc_floor();
             }
             println!("{:?}", state);
-            if state.entry(4).or_insert(Vec::new()).len() == 4 {
+            if state.entry(elevator.top_floor).or_insert(VecDeque::new()).len() == non_floor_entity_count {
                 break;
             }
         }
@@ -125,12 +146,34 @@ impl<'e> Elevator<'e> {
         }
     }
 
-    fn hold_item(&mut self, e: &'e Entity) {
-        let (ref mut left, ref mut right) = self.holding;
-        if !left.is_some() {
-            *left = Some(e).cloned();
-        } else if !right.is_some() {
-            *right = Some(e).cloned();
+    fn load_item(&mut self, e: Entity<'e>) {
+        if !self.holding.0.is_some() {
+            self.holding.0 = Some(e);
+        } else if !self.holding.1.is_some() {
+            self.holding.1 = Some(e);
         }
     }
+
+    fn is_full(&self) -> bool {
+        self.holding.0.is_some() && self.holding.1.is_some()
+    }
+
+    fn unload_left(&mut self) -> Option<Entity<'e>> {
+        let out = self.holding.0.clone();
+        self.holding.0 = None;
+        out
+    }
+
+    fn unload_right(&mut self) -> Option<Entity<'e>> {
+        let out = self.holding.1.clone();
+        self.holding.1 = None;
+        out
+    }
 }
+
+// Interesting syntax usage here but I used a method instead
+//fn unload_left<'e>(&mut Elevator { holding: (ref mut left, _), .. }: &'e mut Elevator) -> Option<Entity<'e>> {
+//    let out = left.clone();
+//    *left = None;
+//    out
+//}
