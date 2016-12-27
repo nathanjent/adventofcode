@@ -87,15 +87,15 @@ fn process(file: &str) -> usize {
         };
         println!("{:?}", elevator);
 
+        // implement Frame-Stewart 4+ towers of hanoi algorithm
+
         loop {
             {
                 let inventory = state.entry(elevator.current_floor).or_insert(VecDeque::new());
                 println!("Floor {}: {:?}", elevator.current_floor, inventory);
-                if let Some(item_a) = elevator.unload_left() {
-                    inventory.push_back(item_a);
-                }
-                if let Some(item_b) = elevator.unload_right() {
-                    inventory.push_back(item_b);
+                if let (Some(l), Some(r)) = elevator.unload_all() {
+                    inventory.push_back(l);
+                    inventory.push_back(r);
                 }
                 loop {
                     if let Some(item) = inventory.pop_front() {
@@ -166,6 +166,13 @@ impl<'e> Elevator<'e> {
 
     fn unload_right(&mut self) -> Option<Entity<'e>> {
         let out = self.holding.1.clone();
+        self.holding.1 = None;
+        out
+    }
+
+    fn unload_all(&mut self) -> (Option<Entity<'e>>, Option<Entity<'e>>) {
+        let out = (self.holding.0.clone(), self.holding.1.clone());
+        self.holding.0 = None;
         self.holding.1 = None;
         out
     }
