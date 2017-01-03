@@ -35,10 +35,10 @@ fn process(file: &str) -> usize {
                                 "second" => tokens.push(Entity::Floor(2)),
                                 "third" => tokens.push(Entity::Floor(3)),
                                 "fourth" => tokens.push(Entity::Floor(4)),
-                                _ => {},
+                                _ => {}
                             }
                         }
-                    },
+                    }
                     "microchip" => {
                         if let Some(m) = words.next() {
                             if let Some(i) = m.find('-') {
@@ -47,22 +47,21 @@ fn process(file: &str) -> usize {
                                 non_floor_entity_count += 1;
                             }
                         }
-                    },
+                    }
                     "generator" => {
                         if let Some(g) = words.next() {
                             tokens.push(Entity::Generator(g));
                             non_floor_entity_count += 1;
                         }
-                    },
-                    _ => {},
+                    }
+                    _ => {}
                 }
             } else {
                 break;
             }
         }
         tokens
-    })
-    {
+    }) {
         let mut floor_id = None;
         let mut floor_inventory = VecDeque::new();
         for token in tokens {
@@ -76,10 +75,12 @@ fn process(file: &str) -> usize {
         }
     }
 
-    if let Some(top_floor) = state.iter().map(|s| {
-        let (f, _): (&usize, &VecDeque<Entity>) = s;
-        *f
-    }).max() {
+    if let Some(top_floor) = state.iter()
+        .map(|s| {
+            let (f, _): (&usize, &VecDeque<Entity>) = s;
+            *f
+        })
+        .max() {
         let mut elevator = Elevator {
             holding: (None, None),
             current_floor: 1,
@@ -104,14 +105,16 @@ fn process(file: &str) -> usize {
                             break;
                         }
                     } else {
-                        panic!("the elevator will only function if it contains at least one RTG or microchip");
+                        panic!("the elevator will only function if it contains at least one RTG \
+                                or microchip");
                     }
                 }
 
                 elevator.inc_floor();
             }
             println!("{:?}", state);
-            if state.entry(elevator.top_floor).or_insert(VecDeque::new()).len() == non_floor_entity_count {
+            if state.entry(elevator.top_floor).or_insert(VecDeque::new()).len() ==
+               non_floor_entity_count {
                 break;
             }
         }
@@ -179,8 +182,9 @@ impl<'e> Elevator<'e> {
 }
 
 // Interesting syntax usage here but I used a method instead
-//fn unload_left<'e>(&mut Elevator { holding: (ref mut left, _), .. }: &'e mut Elevator) -> Option<Entity<'e>> {
+// fn unload_left<'e>(&mut Elevator { holding: (ref mut left, _), .. }: &'e mut Elevator)
+//      -> Option<Entity<'e>> {
 //    let out = left.clone();
 //    *left = None;
 //    out
-//}
+//

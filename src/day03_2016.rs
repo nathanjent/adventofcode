@@ -78,11 +78,7 @@ pub fn square_triangles_2(file: &str) -> usize {
             let a = t[0];
             let b = t[1];
             let c = t[2];
-            if a + b > c {
-                Some(c)
-            } else {
-                None
-            }
+            if a + b > c { Some(c) } else { None }
         })
         .count()
 }

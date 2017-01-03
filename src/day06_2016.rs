@@ -21,7 +21,7 @@ fn parse(file: &str, order_idx: i32) -> String {
 
     let mut buckets = vec![Vec::new();8];
     for line in lines {
-        for (i, letter) in  line.split("")
+        for (i, letter) in line.split("")
             .filter_map(|s| {
                 match s {
                     "" => None,
@@ -29,25 +29,25 @@ fn parse(file: &str, order_idx: i32) -> String {
                 }
             })
             .enumerate() {
-            //print!("{:?}", letter);
+            // print!("{:?}", letter);
             buckets[i].push(letter);
         }
-        //println!("");
+        // println!("");
     }
-    //println!("{:?}", buckets);
+    // println!("{:?}", buckets);
     let mut message = String::new();
     for bucket in buckets {
         let mut counts = BTreeMap::new();
         for c in bucket.into_iter() {
             *counts.entry(c).or_insert(0) += 1;
         }
-        //println!("{:?}", counts);
+        // println!("{:?}", counts);
         let mut stack = counts.into_iter().collect::<Vec<(String, usize)>>();
         // sort high to low
         stack.sort_by(|a, b| b.1.cmp(&a.1));
-        //println!("{:?}", stack);
+        // println!("{:?}", stack);
         let (sorted_letters, _): (Vec<String>, Vec<usize>) = stack.iter().cloned().unzip();
-        //println!("{:?}", sorted_letters);
+        // println!("{:?}", sorted_letters);
         if order_idx < 0 {
             let order_idx = (-order_idx) as usize;
             if order_idx < sorted_letters.len() {
@@ -57,7 +57,6 @@ fn parse(file: &str, order_idx: i32) -> String {
             message.push_str(&*sorted_letters[order_idx as usize]);
         }
     }
-    //println!("{:?}", message);
+    // println!("{:?}", message);
     message
 }
-

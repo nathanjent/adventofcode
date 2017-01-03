@@ -27,11 +27,11 @@ pub fn obsecurity_2(file: &str, room_search_term: &str) -> usize {
             words.push(shifted.iter().cloned().collect::<String>());
         }
         let name = words.into_iter()
-                   .map(|mut s| {
-                       s.push(' ');
-                       s
-                   })
-                   .collect::<String>();
+            .map(|mut s| {
+                s.push(' ');
+                s
+            })
+            .collect::<String>();
         if name.find(room_search_term).is_some() {
             return room.id;
         }
@@ -91,7 +91,8 @@ fn parse_rooms(file: &str) -> (usize, Vec<Room>) {
                         // Collect verified rooms
                         rooms.push(Room {
                             id: id,
-                            encrypted: words.iter().map(|s| s.to_string()).collect::<Vec<String>>() });
+                            encrypted: words.iter().map(|s| s.to_string()).collect::<Vec<String>>(),
+                        });
                         sum += id;
                     }
                 }

@@ -18,14 +18,14 @@ fn decompress(file: &str, full: bool) -> usize {
         .filter_map(Result::ok)
         .collect();
 
-    //let mut out = String::new();
+    // let mut out = String::new();
     let mut count = 0;
     for line in lines {
         count += count_chars(&*line, full);
     }
 
-    //println!("{}", out);
-    //out.chars().count();
+    // println!("{}", out);
+    // out.chars().count();
     count
 }
 
@@ -65,26 +65,26 @@ fn count_chars(line: &str, full: bool) -> usize {
                                 sequence.push(l);
                             }
                         }
-                        //println!("({}x{}){}", marker[0], marker[1], sequence);
+                        // println!("({}x{}){}", marker[0], marker[1], sequence);
                         for _ in 0..(marker[1]) {
                             if full {
                                 count += count_chars(&*sequence, full);
                             } else {
-                                //out.push_str(&*sequence);
+                                // out.push_str(&*sequence);
                                 count += sequence.len();
                             }
                         }
                     }
-                    //println!("{}", out);
-                    //println!("");
-                },
+                    // println!("{}", out);
+                    // println!("");
+                }
                 _ => {
                     count += 1;
-                    //out.push(c);
-                },
+                    // out.push(c);
+                }
             }
         } else {
-            return count
+            return count;
         }
     }
 }

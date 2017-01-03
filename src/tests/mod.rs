@@ -17,6 +17,7 @@ use day06_2016;
 use day07_2016;
 use day08_2016;
 use day09_2016;
+use day10_2016;
 use day11_2016;
 
 // 2015
@@ -101,6 +102,11 @@ fn day08test2() {
 }
 
 #[test]
+fn day09test_base() {
+    assert_eq!(day09::single_night("input/day09_base.txt"), 605);
+}
+
+#[test]
 fn day09test1() {
     assert_eq!(day09::single_night("input/day09.txt"), 0);
 }
@@ -149,27 +155,32 @@ fn day04_2016test1() {
 
 #[test]
 fn day04_2016test2() {
-    assert_eq!(day04_2016::obsecurity_2("input/day04_2016.txt", "northpole object"), 984);
+    assert_eq!(day04_2016::obsecurity_2("input/day04_2016.txt", "northpole object"),
+               984);
 }
 
 #[test]
 fn day05_2016test1() {
-    assert_eq!(day05_2016::chess_1("input/day05_2016.txt"), "2414bc77".to_string());
+    assert_eq!(day05_2016::chess_1("input/day05_2016.txt"),
+               "2414bc77".to_string());
 }
 
 #[test]
 fn day05_2016test2() {
-    assert_eq!(day05_2016::chess_2("input/day05_2016.txt"), "437e60fc".to_string());
+    assert_eq!(day05_2016::chess_2("input/day05_2016.txt"),
+               "437e60fc".to_string());
 }
 
 #[test]
 fn day06_2016test1() {
-    assert_eq!(day06_2016::noisy_signals_1("input/day06_2016.txt"), "tkspfjcc".to_string());
+    assert_eq!(day06_2016::noisy_signals_1("input/day06_2016.txt"),
+               "tkspfjcc".to_string());
 }
 
 #[test]
 fn day06_2016test2() {
-    assert_eq!(day06_2016::noisy_signals_2("input/day06_2016.txt"), "xrlmbypn".to_string());
+    assert_eq!(day06_2016::noisy_signals_2("input/day06_2016.txt"),
+               "xrlmbypn".to_string());
 }
 
 #[test]
@@ -184,7 +195,8 @@ fn day07_2016test2() {
 
 #[test]
 fn day08_2016test_base() {
-    assert_eq!(day08_2016::two_factor_1("input/day08_2016_base.txt", 7, 3), 6);
+    assert_eq!(day08_2016::two_factor_1("input/day08_2016_base.txt", 7, 3),
+               6);
 }
 
 #[test]
@@ -204,7 +216,8 @@ fn day09_2016test_base1() {
 
 #[test]
 fn day09_2016test_base2() {
-    assert_eq!(day09_2016::explosives_2("input/day09_2016_base2.txt"), 242394);
+    assert_eq!(day09_2016::explosives_2("input/day09_2016_base2.txt"),
+               242394);
 }
 
 #[test]
@@ -214,7 +227,18 @@ fn day09_2016test1() {
 
 #[test]
 fn day09_2016test2() {
-    assert_eq!(day09_2016::explosives_2("input/day09_2016.txt"), 11558231665);
+    assert_eq!(day09_2016::explosives_2("input/day09_2016.txt"),
+               11558231665);
+}
+
+#[test]
+fn day10_2016test1() {
+    assert_eq!(day10_2016::balance_bots_1("input/day10_2016.txt"), 0);
+}
+
+#[test]
+fn day10_2016test2() {
+    assert_eq!(day10_2016::balance_bots_2("input/day10_2016.txt"), 0);
 }
 
 #[test]
