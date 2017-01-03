@@ -17,7 +17,7 @@ fn process(file: &str, n: usize) -> usize {
     let mut output = input;
     for _ in 0..n {
         println!("{}", output);
-        output = look_say(&*output);
+        output = look_say(output.trim());
     }
     output.len()
 }
@@ -29,19 +29,17 @@ fn look_say(input: &str) -> String {
     let mut word = Vec::new();
     loop {
         if let Some(c) = cs.next() {
-            println!("curr: {}", c);
-            println!("prev: {}", prev);
+            println!("curr: {} prev: {}", c, prev);
             if c != prev {
                 if word.len() > 0 {
                     if let Some(n) = format!("{}", word.len()).chars().next() {
                         let m = word[0];
                         output.push(n);
                         output.push(m);
-                        println!("{}{}", n, m);
-                        println!("");
+                        println!("({}, {})", n, m);
                     }
+                    word.clear();
                 }
-                word.clear();
             }
             word.push(c);
             prev = c;
@@ -51,8 +49,7 @@ fn look_say(input: &str) -> String {
                     let m = word[0];
                     output.push(n);
                     output.push(m);
-                    println!("{}{}", n, m);
-                    println!("");
+                    println!("({}, {}) eol", n, m);
                 }
             }
             break;
