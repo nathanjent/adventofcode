@@ -7,6 +7,7 @@ use day06;
 use day07;
 use day08;
 use day09;
+use day10;
 
 use day01_2016;
 use day02_2016;
@@ -108,6 +109,16 @@ fn day09test1() {
 #[test]
 fn day09test2() {
     assert_eq!(day09::single_night("input/day09.txt"), 0);
+}
+
+#[test]
+fn day10test1() {
+    assert_eq!(day10::look_say_1("input/day10.txt"), 0);
+}
+
+#[test]
+fn day10test2() {
+    assert_eq!(day10::look_say_2("input/day10.txt"), 0);
 }
 
 // 2016
