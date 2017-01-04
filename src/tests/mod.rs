@@ -119,12 +119,12 @@ fn day09test2() {
 
 #[test]
 fn day10test1() {
-    assert_eq!(day10::look_say_1("input/day10.txt"), 0);
+    assert_eq!(day10::look_say_1("input/day10.txt"), 329356);
 }
 
 #[test]
 fn day10test2() {
-    assert_eq!(day10::look_say_2("input/day10.txt"), 0);
+    assert_eq!(day10::look_say_2("input/day10.txt"), 4666278);
 }
 
 // 2016
