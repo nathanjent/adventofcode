@@ -18,7 +18,7 @@ pub fn single_night(file: &str) -> i64 {
             (from, to, distance)
         })
         .collect::<Vec<(String, String, i64)>>();
-    println!("{:?}", edge_cmds);
+//    println!("{:?}", edge_cmds);
 
     let mut nodes = Vec::new();
     for &(ref from, ref to, _) in edge_cmds.iter() {
@@ -34,7 +34,7 @@ pub fn single_night(file: &str) -> i64 {
     for &(ref from, ref to, ref distance) in edge_cmds.iter() {
         if let Ok(from_idx) = nodes.binary_search(&&from) {
             if let Ok(to_idx) = nodes.binary_search(&&to) {
-                println!("{} <-> {}", from_idx, to_idx);
+//                println!("{} <-> {}", from_idx, to_idx);
                 {
                     edge_lengths.insert((from_idx, to_idx), *distance);
                     let mut neighbors = edges.entry(from_idx).or_insert(Vec::new());
@@ -49,12 +49,14 @@ pub fn single_night(file: &str) -> i64 {
             }
         }
     }
-    println!("{:?}", edge_lengths);
     println!("{:?}", edges);
-    (0..nodes.len()).map(|i| dijkstra(&nodes, &edges, &edge_lengths, i)).min().unwrap()
+    println!("{:?}", edge_lengths);
+    (0..nodes.len()).map(|i| salesman(&nodes, &edges, &edge_lengths, i))
+        .inspect(|distance| println!("{}", distance))
+        .min().unwrap()
 }
 
-fn dijkstra(nodes: &Vec<&String>,
+fn salesman(nodes: &Vec<&String>,
             edges: &HashMap<usize, Vec<usize>>,
             edge_lengths: &HashMap<(usize, usize), i64>,
             source: usize)
@@ -66,52 +68,43 @@ fn dijkstra(nodes: &Vec<&String>,
             let (i, _) = en;
             Some(i)
         })
-        .collect::<Vec<Option<usize>>>();
-    let mut dist = vec![i64::max_value(); nodes.len()];
-    let mut prev = vec![None; nodes.len()];
+    .collect::<Vec<Option<usize>>>();
 
-    dist[source] = 0;
+    let mut visited = vec![false; nodes.len()];
+    visited[source] = true;
+    let mut curr = source;
+    let mut sum = 0;
+    let mut count = 0;
 
     loop {
-        if q.iter().all(Option::is_none) {
+        if visited.iter().all(|&b| b) {
             break;
         }
-        if let Some((min_idx, _)) =
-            dist.iter()
-                .enumerate()
-                .filter(|d| q[d.0].is_some())
-                .inspect(|&e| println!("{:?}", e))
-                .min_by_key(|&(_, v)| {
-                    v
-                }) {
-            println!("");
-            println!("q: {:?}", q);
-            println!("distances: {:?},", dist);
-            println!("dist[{}] = {}", min_idx, dist[min_idx]);
-            let node_idx = q[min_idx];
-            q[min_idx] = None;
-            if let Some(node_idx) = node_idx {
-                if let Some(neighbors) = edges.get(&node_idx) {
-                    for neighbor in neighbors.iter().filter(|&&n| q[n].is_some()) {
-                        let edge_key = (node_idx, *neighbor);
-                        if let Some(length) = edge_lengths.get(&edge_key) {
-                            let alt = dist[node_idx] + length;
-                            println!("neighbor = {:?}", neighbor);
-                            println!("alt = {:?}", alt);
-                            if alt < dist[*neighbor] {
-                                dist[*neighbor] = alt;
-                                println!("dist[{}] = {}", neighbor, dist[*neighbor]);
-                                prev[*neighbor] = Some(node_idx);
-                            }
-                        }
-                    }
+        count += 1;
+        if count == 500 {
+            return i64::max_value();
+        }
+        if let Some(node_idx) = q[curr] {
+            if let Some(neighbors) = edges.get(&node_idx) {
+                if let Some((&min_idx, &length)) = neighbors.iter()
+                    .filter(|&&n| q[n].is_some())
+                        .map(|neighbor| {
+                            let edge_key = (node_idx, *neighbor);
+                            let length = edge_lengths.get(&edge_key).unwrap();
+                            (neighbor, length)
+                        })
+                .min_by_key(|&(_, &length)| length)
+                {
+                    println!("min: {:?}", min_idx);
+                    visited[min_idx] = true;
+                    curr = min_idx;
+                    sum += length;
+                    count = 0;
                 }
             }
         }
     }
-    println!("distances: {:?},", dist);
-    println!("path: {:?},", prev);
-    dist.iter().sum()
+    sum
 }
 
 #[derive(Debug)]
