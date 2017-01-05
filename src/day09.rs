@@ -3,10 +3,25 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::collections::HashMap;
 
-pub fn single_night(file: &str) -> i64 {
+pub fn single_night_1(file: &str) -> i64 {
+    let graph = generate_graph(file);
+    (0..graph.nodes.len()).map(|i| salesman(&graph, i))
+        .inspect(|distance| println!("{}", distance))
+        .min().unwrap()
+}
+
+pub fn single_night_2(file: &str) -> i64 {
+    let graph = generate_graph(file);
+    (0..graph.nodes.len()).map(|i| salesman(&graph, i))
+        .inspect(|distance| println!("{}", distance))
+        .max().unwrap()
+}
+
+fn generate_graph(file: &str) -> Graph {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
+    let mut nodes = Vec::new();
     let edge_cmds = reader.lines()
         .filter_map(Result::ok)
         .map(|line| {
@@ -15,16 +30,12 @@ pub fn single_night(file: &str) -> i64 {
             let to = words[2].to_owned();
             let distance = words[4].parse::<i64>().expect("parse error");
 
+            nodes.push(from.clone());
+            nodes.push(to.clone());
             (from, to, distance)
         })
         .collect::<Vec<(String, String, i64)>>();
 //    println!("{:?}", edge_cmds);
-
-    let mut nodes = Vec::new();
-    for &(ref from, ref to, _) in edge_cmds.iter() {
-        nodes.push(from);
-        nodes.push(to);
-    }
     nodes.sort();
     nodes.dedup();
     println!("{:?}", nodes);
@@ -51,56 +62,41 @@ pub fn single_night(file: &str) -> i64 {
     }
     println!("{:?}", edges);
     println!("{:?}", edge_lengths);
-    (0..nodes.len()).map(|i| salesman(&nodes, &edges, &edge_lengths, i))
-        .inspect(|distance| println!("{}", distance))
-        .min().unwrap()
+    Graph { nodes: nodes, edges: edges, edge_lengths: edge_lengths }
 }
 
-fn salesman(nodes: &Vec<&String>,
-            edges: &HashMap<usize, Vec<usize>>,
-            edge_lengths: &HashMap<(usize, usize), i64>,
-            source: usize)
-            -> i64 {
-
-    let mut q = nodes.iter()
+fn salesman(graph: &Graph, source: usize) -> i64 {
+    let node_idxs = graph.nodes.iter()
         .enumerate()
-        .map(|en| {
-            let (i, _) = en;
-            Some(i)
-        })
-    .collect::<Vec<Option<usize>>>();
+        .map(|(i, _)| i)
+    .collect::<Vec<usize>>();
 
-    let mut visited = vec![false; nodes.len()];
-    visited[source] = true;
+    let mut visited = vec![false; graph.nodes.len()];
     let mut curr = source;
+    visited[curr] = true;
+    println!("visit: {:?}", graph.nodes[source]);
     let mut sum = 0;
-    let mut count = 0;
 
     loop {
         if visited.iter().all(|&b| b) {
             break;
         }
-        count += 1;
-        if count == 500 {
-            return i64::max_value();
-        }
-        if let Some(node_idx) = q[curr] {
-            if let Some(neighbors) = edges.get(&node_idx) {
-                if let Some((&min_idx, &length)) = neighbors.iter()
-                    .filter(|&&n| q[n].is_some())
-                        .map(|neighbor| {
-                            let edge_key = (node_idx, *neighbor);
-                            let length = edge_lengths.get(&edge_key).unwrap();
-                            (neighbor, length)
-                        })
-                .min_by_key(|&(_, &length)| length)
-                {
-                    println!("min: {:?}", min_idx);
-                    visited[min_idx] = true;
-                    curr = min_idx;
-                    sum += length;
-                    count = 0;
-                }
+        let node_idx = node_idxs[curr];
+        if let Some(neighbors) = graph.edges.get(&node_idx) {
+            if let Some((min_idx, &length))
+                = neighbors.iter()
+                    .filter(|&&n| !visited[n])
+                    .map(|&neighbor| {
+                        let edge_key = (node_idx, neighbor);
+                        let length = graph.edge_lengths.get(&edge_key).unwrap();
+                        (neighbor, length)
+                    })
+            .min_by_key(|&(_, &length)| length)
+            {
+                println!("visit: {:?}", graph.nodes[min_idx]);
+                visited[min_idx] = true;
+                curr = min_idx;
+                sum += length;
             }
         }
     }
@@ -112,4 +108,10 @@ struct Edge {
     from: usize,
     to: usize,
     length: i64,
+}
+
+struct Graph {
+    nodes: Vec<String>,
+    edges: HashMap<usize, Vec<usize>>,
+    edge_lengths: HashMap<(usize, usize), i64>,
 }

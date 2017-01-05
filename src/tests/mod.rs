@@ -103,18 +103,23 @@ fn day08test2() {
 }
 
 #[test]
-fn day09test_base() {
-    assert_eq!(day09::single_night("input/day09_base.txt"), 605);
+fn day09test_base1() {
+    assert_eq!(day09::single_night_1("input/day09_base.txt"), 605);
+}
+
+#[test]
+fn day09test_base2() {
+    assert_eq!(day09::single_night_2("input/day09_base.txt"), 982);
 }
 
 #[test]
 fn day09test1() {
-    assert_eq!(day09::single_night("input/day09.txt"), 0);
+    assert_eq!(day09::single_night_1("input/day09.txt"), 251);
 }
 
 #[test]
 fn day09test2() {
-    assert_eq!(day09::single_night("input/day09.txt"), 0);
+    assert_eq!(day09::single_night_2("input/day09.txt"), 0);
 }
 
 #[test]
