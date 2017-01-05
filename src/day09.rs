@@ -5,14 +5,14 @@ use std::collections::HashMap;
 
 pub fn single_night_1(file: &str) -> i64 {
     let graph = generate_graph(file);
-    (0..graph.nodes.len()).map(|i| salesman(&graph, i))
+    (0..graph.nodes.len()).map(|i| salesman(&graph, i, true))
         .inspect(|distance| println!("{}", distance))
         .min().unwrap()
 }
 
 pub fn single_night_2(file: &str) -> i64 {
     let graph = generate_graph(file);
-    (0..graph.nodes.len()).map(|i| salesman(&graph, i))
+    (0..graph.nodes.len()).map(|i| salesman(&graph, i, false))
         .inspect(|distance| println!("{}", distance))
         .max().unwrap()
 }
@@ -38,7 +38,7 @@ fn generate_graph(file: &str) -> Graph {
 //    println!("{:?}", edge_cmds);
     nodes.sort();
     nodes.dedup();
-    println!("{:?}", nodes);
+    println!("nodes: {:?}", nodes);
 
     let mut edge_lengths = HashMap::new();
     let mut edges = HashMap::new();
@@ -60,12 +60,12 @@ fn generate_graph(file: &str) -> Graph {
             }
         }
     }
-    println!("{:?}", edges);
-    println!("{:?}", edge_lengths);
+    println!("edges: {:?}", edges);
+    println!("edge lengths: {:?}", edge_lengths);
     Graph { nodes: nodes, edges: edges, edge_lengths: edge_lengths }
 }
 
-fn salesman(graph: &Graph, source: usize) -> i64 {
+fn salesman(graph: &Graph, source: usize, min: bool) -> i64 {
     let node_idxs = graph.nodes.iter()
         .enumerate()
         .map(|(i, _)| i)
@@ -83,20 +83,36 @@ fn salesman(graph: &Graph, source: usize) -> i64 {
         }
         let node_idx = node_idxs[curr];
         if let Some(neighbors) = graph.edges.get(&node_idx) {
-            if let Some((min_idx, &length))
-                = neighbors.iter()
+            if min {
+                if let Some((min_idx, &length)) = neighbors.iter()
                     .filter(|&&n| !visited[n])
                     .map(|&neighbor| {
                         let edge_key = (node_idx, neighbor);
                         let length = graph.edge_lengths.get(&edge_key).unwrap();
                         (neighbor, length)
                     })
-            .min_by_key(|&(_, &length)| length)
-            {
-                println!("visit: {:?}", graph.nodes[min_idx]);
-                visited[min_idx] = true;
-                curr = min_idx;
-                sum += length;
+                    .inspect(|n| println!("{:?}", n))
+                    .min_by_key(|&(_, &length)| length) {
+                    println!("visit: {:?}", graph.nodes[min_idx]);
+                    visited[min_idx] = true;
+                    curr = min_idx;
+                    sum += length;
+                }
+            } else {
+                if let Some((max_idx, &length)) = neighbors.iter()
+                    .filter(|&&n| !visited[n])
+                        .map(|&neighbor| {
+                            let edge_key = (node_idx, neighbor);
+                            let length = graph.edge_lengths.get(&edge_key).unwrap();
+                            (neighbor, length)
+                        })
+                .inspect(|n| println!("{:?}", n))
+                    .max_by_key(|&(_, &length)| length) {
+                        println!("visit: {:?}", graph.nodes[max_idx]);
+                        visited[max_idx] = true;
+                        curr = max_idx;
+                        sum += length;
+                    }
             }
         }
     }
