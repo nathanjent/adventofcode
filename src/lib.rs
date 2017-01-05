@@ -1,6 +1,7 @@
 extern crate regex;
 extern crate md5;
 
+// 2015
 pub mod day01;
 pub mod day02;
 pub mod day03;
@@ -11,7 +12,9 @@ pub mod day07;
 pub mod day08;
 pub mod day09;
 pub mod day10;
+pub mod day11;
 
+// 2016
 pub mod day01_2016;
 pub mod day02_2016;
 pub mod day03_2016;

@@ -8,6 +8,7 @@ use day07;
 use day08;
 use day09;
 use day10;
+use day11;
 
 use day01_2016;
 use day02_2016;
@@ -130,6 +131,16 @@ fn day10test1() {
 #[test]
 fn day10test2() {
     assert_eq!(day10::look_say_2("input/day10.txt"), 4666278);
+}
+
+#[test]
+fn day11test1() {
+    assert_eq!(day11::corporate_policy_1("input/day11.txt"), 0);
+}
+
+#[test]
+fn day11test2() {
+    assert_eq!(day11::corporate_policy_2("input/day11.txt"), 0);
 }
 
 // 2016
