@@ -135,12 +135,12 @@ fn day10test2() {
 
 #[test]
 fn day11test1() {
-    assert_eq!(day11::corporate_policy_1("input/day11.txt"), 0);
+    assert_eq!(day11::corporate_policy_1("input/day11.txt"), "Not the answer yet");
 }
 
 #[test]
 fn day11test2() {
-    assert_eq!(day11::corporate_policy_2("input/day11.txt"), 0);
+    assert_eq!(day11::corporate_policy_2("input/day11.txt"), "Not the answer yet");
 }
 
 // 2016
