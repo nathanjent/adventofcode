@@ -9,6 +9,7 @@ use day08;
 use day09;
 use day10;
 use day11;
+use day12;
 
 use day01_2016;
 use day02_2016;
@@ -146,6 +147,16 @@ fn day11test1() {
 #[test]
 fn day11test2() {
     assert_eq!(day11::corporate_policy_2("input/day11.txt"), "hxcaabcc");
+}
+
+#[test]
+fn day12test1() {
+    assert_eq!(day12::abacus_framework_1("input/day12.txt"), 156366);
+}
+
+#[test]
+fn day12test2() {
+    assert_eq!(day12::abacus_framework_2("input/day12.txt"), 0);
 }
 
 // 2016
