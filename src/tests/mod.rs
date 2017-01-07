@@ -134,13 +134,18 @@ fn day10test2() {
 }
 
 #[test]
+fn day11test_base() {
+    assert_eq!(day11::corporate_policy_1("input/day11_base.txt"), "abcdffaa");
+}
+
+#[test]
 fn day11test1() {
-    assert_eq!(day11::corporate_policy_1("input/day11.txt"), 0);
+    assert_eq!(day11::corporate_policy_1("input/day11.txt"), "hxbxxyzz");
 }
 
 #[test]
 fn day11test2() {
-    assert_eq!(day11::corporate_policy_2("input/day11.txt"), 0);
+    assert_eq!(day11::corporate_policy_2("input/day11.txt"), "hxcaabcc");
 }
 
 // 2016
