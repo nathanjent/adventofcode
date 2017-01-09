@@ -150,13 +150,18 @@ fn day11test2() {
 }
 
 #[test]
+fn day12test_base() {
+    assert_eq!(day12::abacus_framework_2("input/day12_base.txt"), 16);
+}
+
+#[test]
 fn day12test1() {
     assert_eq!(day12::abacus_framework_1("input/day12.txt"), 156366);
 }
 
 #[test]
 fn day12test2() {
-    assert_eq!(day12::abacus_framework_2("input/day12.txt"), 0);
+    assert_eq!(day12::abacus_framework_2("input/day12.txt"), 96852);
 }
 
 // 2016
