@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Nathan Jent <nathanjent@gmail.com>"]
 
 [dependencies]
-md5 = "0.1.1"
-regex = "0.1"
+md5 = "0.2.1"
+regex = "0.2.1"
+simple_json = "0.2.3"
