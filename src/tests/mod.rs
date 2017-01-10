@@ -10,6 +10,7 @@ use day09;
 use day10;
 use day11;
 use day12;
+use day13;
 
 use day01_2016;
 use day02_2016;
@@ -162,6 +163,16 @@ fn day12test1() {
 #[test]
 fn day12test2() {
     assert_eq!(day12::abacus_framework_2("input/day12.txt"), 96852);
+}
+
+#[test]
+fn day13test1() {
+    assert_eq!(day13::knights_table_1("input/day13.txt"), 0);
+}
+
+#[test]
+fn day13test2() {
+    assert_eq!(day13::knights_table_2("input/day13.txt"), 0);
 }
 
 // 2016

@@ -90,7 +90,7 @@ fn inc_str(s: String) -> String {
     loop {
         if let Some(c) = iter.next() {
             //println!("pop: {}", c);
-            let mut byte = c as u8 + 1;
+            let byte = c as u8 + 1;
             if byte <= 'z' as u8 {
                 match byte as char {
                     ch @ 'i' | ch @ 'o' | ch @ 'l' => {

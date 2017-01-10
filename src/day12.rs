@@ -5,7 +5,6 @@ use self::simple_json::{Json, Number};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::collections::HashMap;
 
 pub fn abacus_framework_1(file: &str) -> i64 {
     let input = File::open(file).expect("File open fail.");
@@ -43,11 +42,11 @@ pub fn abacus_framework_2(file: &str) -> i64 {
 fn process_json(json: &Json) -> Result<i64, &str> {
     match json {
         &Json::Null => {
-            //println!("null, ");
+            println!("null, ");
             return Ok(0)
         },
         &Json::Boolean(value) => {
-            //println!("{:?}, ", value);
+            println!("{:?}, ", value);
             return Ok(0)
         },
         &Json::Number(ref value) => {

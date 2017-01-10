@@ -7,3 +7,4 @@ authors = ["Nathan Jent <nathanjent@gmail.com>"]
 md5 = "0.2.1"
 regex = "0.2.1"
 simple_json = "0.2.3"
+optimization = "0.1.0"
