@@ -1,5 +1,8 @@
 extern crate regex;
 extern crate md5;
+extern crate optimization;
+extern crate abc;
+extern crate rand;
 
 // 2015
 pub mod day01;
