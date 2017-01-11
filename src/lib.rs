@@ -3,6 +3,7 @@ extern crate md5;
 extern crate optimization;
 extern crate abc;
 extern crate rand;
+extern crate num;
 
 // 2015
 pub mod day01;

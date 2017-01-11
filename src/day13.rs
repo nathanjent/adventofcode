@@ -1,11 +1,15 @@
 use optimization::{Minimizer, GradientDescent, NumericalDifferentiation, Func};
 use abc::{Context, Candidate, HiveBuilder, scaling};
 use rand::{thread_rng, Rng};
+use num::{Zero, One};
 
+use std::fmt;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::collections::HashMap;
+use std::ops::{Index, IndexMut};
+use std::ops::{Add, Sub, Mul, Div, Rem};
 
 pub fn knights_table_1(file: &str) -> i64 {
     process(file)
@@ -32,9 +36,9 @@ fn process(file: &str) -> i64 {
     }
     guest_names.sort();
     guest_names.dedup();
-    //println!("{:?}", guest_names);
+    println!("{:?}", guest_names);
 
-    let mut guests = HashMap::new();
+    let mut guest_data = Matrix10::new(0f64);
     for line in lines.iter() {
         let mut words = line.split_whitespace();
         let guest = words.next();
@@ -54,11 +58,7 @@ fn process(file: &str) -> i64 {
                             //print!("{}, ", g_idx);
                             if let Ok(a_idx) = guest_names.binary_search(&a.trim_matches('.')) {
                                 //println!("{}", a_idx);
-                                let guest = guests.entry(g_idx).or_insert(Guest {
-                                        name_idx: g_idx,
-                                        affectors: HashMap::new(),
-                                    });
-                                guest.affectors.insert(a_idx, num);
+                                guest_data[(g_idx, a_idx)] = num as f64;
                             }
                         }
                     }
@@ -66,7 +66,7 @@ fn process(file: &str) -> i64 {
             }
         }
     }
-    println!("{:?}", guests);
+    println!("{:?}", guest_data);
 
 //    // numeric version of the Rosenbrock function
 //    let function =
@@ -86,28 +86,54 @@ fn process(file: &str) -> i64 {
     42
 }
 
-#[derive(Clone, Debug)]
-struct Guest {
-    name_idx: usize,
-    affectors: HashMap<usize, isize>,
-}
-
-impl Context for Guest {
-    type Solution = usize;
+impl<T> Context for Matrix10<T> where T: Copy + Send + Sync + One {
+    type Solution = (usize, usize);
 
     fn make(&self) -> Self::Solution {
-        thread_rng().gen_range(0, self.affectors.len())
+        (thread_rng().gen_range(0, 10), thread_rng().gen_range(0, 10))
     }
 
     fn evaluate_fitness(&self, solution: &Self::Solution) -> f64 {
-        let mut x = 0;
-        for _ in 0..1_000 {
-            x += 1;
-        }
-        (x - x) as f64 + *solution as f64
+        // TODO convert T to f64 somehow
+        //self[*solution]
+        42.0
     }
 
     fn explore(&self, field: &[Candidate<Self::Solution>], n: usize) -> Self::Solution {
-        field[n].solution + thread_rng().gen_range(0, 10)
+        field[n].solution
+    }
+}
+
+struct Matrix10<T> {
+    d: [T; 100],
+}
+
+impl<T> Matrix10<T> {
+    fn new(init: T) -> Matrix10<T> where T: Copy + Send + Sync + One {
+        Matrix10 { d: [init; 100] }
+    }
+}
+
+impl<T> Index<(usize, usize)> for Matrix10<T> {
+    type Output = T;
+
+    #[inline]
+    fn index(&self, (i, j): (usize, usize)) -> &T {
+        assert!(i < 10 && j < 10);
+        &self.d[i * 10 + j]
+    }
+}
+
+impl<T> IndexMut<(usize, usize)> for Matrix10<T> {
+    #[inline]
+    fn index_mut(&mut self, (i, j): (usize, usize)) -> &mut T {
+        assert!(i < 10 && j < 10);
+        &mut self.d[i * 10 + j]
+    }
+}
+
+impl<T> fmt::Debug for Matrix10<T> where T: fmt::Debug {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_list().entries(self.d.iter()).finish()
     }
 }
