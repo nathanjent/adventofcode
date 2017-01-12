@@ -11,6 +11,7 @@ use day10;
 use day11;
 use day12;
 use day13;
+use day14;
 
 use day01_2016;
 use day02_2016;
@@ -173,6 +174,21 @@ fn day13test1() {
 #[test]
 fn day13test2() {
     assert_eq!(day13::knights_table_2("input/day13.txt"), 0);
+}
+
+#[test]
+fn day14test_base() {
+    assert_eq!(day14::reindeer_olympics_1("input/day14_base.txt", 1000), 0);
+}
+
+#[test]
+fn day14test1() {
+    assert_eq!(day14::reindeer_olympics_1("input/day14.txt", 2503), 0);
+}
+
+#[test]
+fn day14test2() {
+    assert_eq!(day14::reindeer_olympics_2("input/day14.txt", 1), 0);
 }
 
 // 2016
