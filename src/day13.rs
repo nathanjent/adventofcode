@@ -1,15 +1,11 @@
 use optimization::{Minimizer, GradientDescent, NumericalDifferentiation, Func};
 use abc::{Context, Candidate, HiveBuilder, scaling};
 use rand::{thread_rng, Rng};
-use num::{Zero, One};
 
-use std::fmt;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::collections::HashMap;
-use std::ops::{Index, IndexMut};
-use std::ops::{Add, Sub, Mul, Div, Rem};
 
 pub fn knights_table_1(file: &str) -> i64 {
     process(file)
@@ -18,6 +14,9 @@ pub fn knights_table_1(file: &str) -> i64 {
 pub fn knights_table_2(file: &str) -> i64 {
     process(file)
 }
+
+// make an array matrix
+impl_matrix!(GuestMatrix([i64; (10, 10)]));
 
 fn process(file: &str) -> i64 {
     let input = File::open(file).expect("File open fail.");
@@ -38,7 +37,7 @@ fn process(file: &str) -> i64 {
     guest_names.dedup();
     println!("{:?}", guest_names);
 
-    let mut guest_data = Matrix10::new(0f64);
+    let mut guest_data = GuestMatrix([0; 100]);
     for line in lines.iter() {
         let mut words = line.split_whitespace();
         let guest = words.next();
@@ -50,7 +49,7 @@ fn process(file: &str) -> i64 {
                 _ => 0,
             };
             if let Some(n) = words.next() {
-                let num = modifier * n.parse::<isize>().unwrap_or(0);
+                let num = modifier * n.parse::<i64>().unwrap_or(0);
                 if let Some(g) = guest {
                     if let Some(a) = words.last() {
                         //println!("{}, {}", g, a);
@@ -58,7 +57,7 @@ fn process(file: &str) -> i64 {
                             //print!("{}, ", g_idx);
                             if let Ok(a_idx) = guest_names.binary_search(&a.trim_matches('.')) {
                                 //println!("{}", a_idx);
-                                guest_data[(g_idx, a_idx)] = num as f64;
+                                guest_data[(g_idx, a_idx)] = num;
                             }
                         }
                     }
@@ -79,61 +78,60 @@ fn process(file: &str) -> i64 {
 //    let solution = minimizer.minimize(&function, guests);
 
 
-//    let hive = HiveBuilder::<HashMap<Guest>>::new(guests, 5)
-//                .set_threads(5)
-//                        .set_scaling(scaling::power_rank(10_f64));
-//    println!("{:?}", hive.build().unwrap().run_for_rounds(1_000));
-    42
+    let hive = HiveBuilder::<GuestMatrix>::new(guest_data, 5)
+                .set_threads(5)
+                        .set_scaling(scaling::power_rank(10_f64));
+    let best_after_1000 = hive.build().unwrap().run_for_rounds(1_000);
+    println!("{:?}", best_after_1000);
+    best_after_1000.expect("Error in hive threading.").fitness as i64
 }
 
-impl<T> Context for Matrix10<T> where T: Copy + Send + Sync + One {
-    type Solution = (usize, usize);
+impl Context for GuestMatrix {
+    type Solution = [usize; 10];
 
+    // Generates random guest seating arrangement
     fn make(&self) -> Self::Solution {
-        (thread_rng().gen_range(0, 10), thread_rng().gen_range(0, 10))
+        let mut rng = thread_rng();
+        let mut idxs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        rng.shuffle(&mut idxs);
+        //print!("{:?} ", idxs);
+        idxs
     }
 
+    // Calculate total change in happiness for the solution
     fn evaluate_fitness(&self, solution: &Self::Solution) -> f64 {
-        // TODO convert T to f64 somehow
-        //self[*solution]
-        42.0
+        // TODO add window for (last_idx, first_idx) somehow
+        solution.windows(2)
+            //.inspect(|i| println!("{:?}", i))
+            .filter_map(|i| {
+                if let Some(a) = i.first() {
+                    if let Some(b) = i.last() {
+                        Some((a, b))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            })
+            //.inspect(|i| println!("{:?}", i))
+            .fold(0, |acc, (&r, &c)| {
+                acc + self[(r, c)]
+            }) as f64
     }
 
+    // Swaps two randomly selected guest seat placement generating a "nearby" solution
     fn explore(&self, field: &[Candidate<Self::Solution>], n: usize) -> Self::Solution {
-        field[n].solution
-    }
-}
-
-struct Matrix10<T> {
-    d: [T; 100],
-}
-
-impl<T> Matrix10<T> {
-    fn new(init: T) -> Matrix10<T> where T: Copy + Send + Sync + One {
-        Matrix10 { d: [init; 100] }
-    }
-}
-
-impl<T> Index<(usize, usize)> for Matrix10<T> {
-    type Output = T;
-
-    #[inline]
-    fn index(&self, (i, j): (usize, usize)) -> &T {
-        assert!(i < 10 && j < 10);
-        &self.d[i * 10 + j]
-    }
-}
-
-impl<T> IndexMut<(usize, usize)> for Matrix10<T> {
-    #[inline]
-    fn index_mut(&mut self, (i, j): (usize, usize)) -> &mut T {
-        assert!(i < 10 && j < 10);
-        &mut self.d[i * 10 + j]
-    }
-}
-
-impl<T> fmt::Debug for Matrix10<T> where T: fmt::Debug {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_list().entries(self.d.iter()).finish()
+        //println!("{:?}", field);
+        let mut rng = thread_rng();
+        let mut a = 0;
+        let mut b = 0;
+        while a == b {
+            a = rng.gen_range(0, 9);
+            b = rng.gen_range(0, 9);
+        }
+        let mut nearby_solution = field[n].solution.clone();
+        nearby_solution.swap(a, b);
+        nearby_solution
     }
 }

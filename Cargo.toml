@@ -11,3 +11,4 @@ optimization = "0.1.0"
 abc = "0.2.3"
 rand = "0.3.15"
 num = "0.1.36"
+array_matrix = { git = "https://github.com/nathanjent/array_matrix" }

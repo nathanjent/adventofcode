@@ -5,6 +5,8 @@ extern crate abc;
 extern crate rand;
 extern crate num;
 
+#[macro_use] extern crate array_matrix;
+
 // 2015
 pub mod day01;
 pub mod day02;
