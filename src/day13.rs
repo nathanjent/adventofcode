@@ -1,11 +1,14 @@
 use optimization::{Minimizer, GradientDescent, NumericalDifferentiation, Func};
 use abc::{Context, Candidate, HiveBuilder, scaling};
 use rand::{thread_rng, Rng};
+use array_matrix::ArrayMatrix;
 
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::collections::HashMap;
+use std::fmt;
+use std::ops::{Index, IndexMut};
 
 pub fn knights_table_1(file: &str) -> i64 {
     process(file)
