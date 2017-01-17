@@ -33,7 +33,7 @@ dependencies = [
 [[package]]
 name = "array_matrix"
 version = "0.1.0"
-source = "git+https://github.com/nathanjent/array_matrix#8bdd091a993e9d8602c45b6145fed6a094480976"
+source = "git+https://github.com/nathanjent/array_matrix#161c3099e819f917f08c028e7f93eb87c86d15f2"
 
 [[package]]
 name = "crossbeam"

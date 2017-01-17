@@ -168,7 +168,7 @@ fn day12test2() {
 
 #[test]
 fn day13test_base() {
-    assert_eq!(day13::knights_table_1("input/day13_base.txt"), 0);
+    assert_eq!(day13::knights_table_base("input/day13_base.txt"), 0);
 }
 
 #[test]

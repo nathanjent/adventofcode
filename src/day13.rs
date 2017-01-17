@@ -1,3 +1,4 @@
+use array_matrix::ArrayMatrix;
 use optimization::{Minimizer, GradientDescent, NumericalDifferentiation, Func};
 use abc::{Context, Candidate, HiveBuilder, scaling};
 use rand::{thread_rng, Rng};
@@ -6,19 +7,29 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::collections::HashMap;
+use std::ops::{Index, IndexMut};
+use std::fmt;
+
+pub fn knights_table_base(file: &str) -> i64 {
+    let guest_data = GuestMatrix([0; 100]);
+    process(file, guest_data)
+}
 
 pub fn knights_table_1(file: &str) -> i64 {
-    process(file)
+    let guest_data = GuestMatrix([0; 100]);
+    process(file, guest_data)
 }
 
 pub fn knights_table_2(file: &str) -> i64 {
-    process(file)
+    let guest_data = GuestMatrix([0; 100]);
+    process(file, guest_data)
 }
 
 // make an array matrix
 impl_matrix!(GuestMatrix([i64; (10, 10)]));
 
-fn process(file: &str) -> i64 {
+
+fn process<T: ArrayMatrix + Context + Index<(usize, usize)> + IndexMut<(usize, usize)>>(file: &str, guest_data: T) -> i64 {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -37,7 +48,6 @@ fn process(file: &str) -> i64 {
     guest_names.dedup();
     println!("{:?}", guest_names);
 
-    let mut guest_data = GuestMatrix([0; 100]);
     for line in lines.iter() {
         let mut words = line.split_whitespace();
         let guest = words.next();
@@ -65,25 +75,25 @@ fn process(file: &str) -> i64 {
             }
         }
     }
-    println!("{:?}", guest_data);
+    //println!("{:?}", guest_data);
 
-//    // numeric version of the Rosenbrock function
-//    let function =
-//        NumericalDifferentiation::new(Func(|g_rule: &[f64]| {
-//            30.0
-//    }));
-//
-//    let minimizer = GradientDescent::new();
-//
-//    let solution = minimizer.minimize(&function, guests);
-
-
-    let hive = HiveBuilder::<GuestMatrix>::new(guest_data, 5)
-                .set_threads(5)
-                        .set_scaling(scaling::power_rank(10_f64));
+    let hive = HiveBuilder::<T>::new(guest_data, 5)
+        .set_threads(1)
+        .set_scaling(scaling::
+                     //power(10_f64) // causes error in hive.rs:273
+                     power_rank(10_f64)
+                     //proportionate() // causes error in hive.rs:273
+                     //rank()
+                    );
     let best_after_1000 = hive.build().unwrap().run_for_rounds(1_000);
-    println!("{:?}", best_after_1000);
-    best_after_1000.expect("Error in hive threading.").fitness as i64
+    let candidate = best_after_1000.expect("Error in hive threading.");
+    candidate.solution.iter()
+        .filter_map(|&i| guest_names.get(i))
+        .inspect(|s| print!("{:?} ", s))
+        .cloned()
+        .collect::<Vec<&str>>();
+    println!("{:?}", candidate);
+    candidate.fitness as i64
 }
 
 impl Context for GuestMatrix {
@@ -100,8 +110,24 @@ impl Context for GuestMatrix {
 
     // Calculate total change in happiness for the solution
     fn evaluate_fitness(&self, solution: &Self::Solution) -> f64 {
-        // TODO add window for (last_idx, first_idx) somehow
-        solution.windows(2)
+        //let mut min = i64::max_value();
+        //let mut max = i64::min_value();
+        let mut sum = 0;
+        let mut sums = Vec::new();
+        let first = solution[0];
+        let last = solution[solution.len() - 1];
+        let h_mod_first_last = self[(last, first)] + self[(first, last)];
+        println!("({}, {}): {}", last, first, self[(last, first)]);
+        println!("({}, {}): {}", first, last, self[(first, last)]);
+        sums.push(h_mod_first_last);
+        sum += h_mod_first_last ;
+        //if h_mod_first_last > max {
+        //    max = h_mod_first_last;
+        //}
+        //if h_mod_first_last < min {
+        //    min = h_mod_first_last;
+        //}
+        for (&r, &c) in solution.windows(2)
             //.inspect(|i| println!("{:?}", i))
             .filter_map(|i| {
                 if let Some(a) = i.first() {
@@ -114,10 +140,26 @@ impl Context for GuestMatrix {
                     None
                 }
             })
-            //.inspect(|i| println!("{:?}", i))
-            .fold(0, |acc, (&r, &c)| {
-                acc + self[(r, c)]
-            }) as f64
+            .inspect(|&(&i, &j)| {
+                println!("({}, {}): {}", i, j, self[(i, j)]);
+                println!("({}, {}): {}", j, i, self[(j, i)]);
+            })
+        {
+            let happiness_modifier = self[(r, c)] + self[(c, r)];
+            //if happiness_modifier > max {
+            //    max = happiness_modifier;
+            //}
+            //if happiness_modifier < min {
+            //    min = happiness_modifier;
+            //}
+            sums.push(happiness_modifier);
+            sum += happiness_modifier;
+        }
+        //(max - min) as f64
+        println!("[{}] {:?}", sum, solution);
+        println!("{:?}", sums);
+        println!("");
+        sum as f64
     }
 
     // Swaps two randomly selected guest seat placement generating a "nearby" solution
