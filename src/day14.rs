@@ -76,7 +76,7 @@ fn process(file: &str, seconds: usize) -> i64 {
     println!("{:?}", racers);
 
     let (_, winner) = racers.into_iter()
-        .max_by_key(|&(k, ref v)| {
+        .max_by_key(|&(_, ref v)| {
             v.distance
         }).expect("Race cancelled");
     winner.distance as i64

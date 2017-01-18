@@ -59,7 +59,7 @@ fn parse_cmds(file: &str) -> usize {
 
     // Load MicroChips from input bins
     input_tokens.iter().map(|tokens| {
-        let mut val;
+        let val;
         match tokens[0] {
             Token::Value(n) => val = MicroChip(n),
             Token::Bot(_) => unreachable!(),
@@ -84,8 +84,8 @@ fn parse_cmds(file: &str) -> usize {
                 low = bot.low();
                 high = bot.high();
             }
-            Token::Value(n) => unreachable!(),
-            Token::Output(n) => unreachable!(),
+            Token::Value(_) => unreachable!(),
+            Token::Output(_) => unreachable!(),
         }
         if let Some(low) = low {
             match tokens[1] {
@@ -99,7 +99,7 @@ fn parse_cmds(file: &str) -> usize {
                     let mut to = out_bins.entry(n).or_insert(OutputBin { chip: None });
                     to.chip = Some(low);
                 }
-                Token::Value(n) => unreachable!(),
+                Token::Value(_) => unreachable!(),
             }
         }
         if let Some(high) = high {
@@ -114,7 +114,7 @@ fn parse_cmds(file: &str) -> usize {
                     let mut to = out_bins.entry(n).or_insert(OutputBin { chip: None });
                     to.chip = Some(high);
                 }
-                Token::Value(n) => unreachable!(),
+                Token::Value(_) => unreachable!(),
             }
         }
     });

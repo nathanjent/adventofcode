@@ -5,8 +5,7 @@ use rand::{thread_rng, Rng};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 pub fn knights_table_1(file: &str) -> i64 {
     process(file, None)

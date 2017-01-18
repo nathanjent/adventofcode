@@ -119,13 +119,6 @@ fn salesman(graph: &Graph, source: usize, min: bool) -> i64 {
     sum
 }
 
-#[derive(Debug)]
-struct Edge {
-    from: usize,
-    to: usize,
-    length: i64,
-}
-
 struct Graph {
     nodes: Vec<String>,
     edges: HashMap<usize, Vec<usize>>,
