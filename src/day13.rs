@@ -1,27 +1,22 @@
-use optimization::{Minimizer, GradientDescent, NumericalDifferentiation, Func};
+use generic_matrix::Matrix;
 use abc::{Context, Candidate, HiveBuilder, scaling};
 use rand::{thread_rng, Rng};
-use array_matrix::ArrayMatrix;
 
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::collections::HashMap;
-use std::fmt;
-use std::ops::{Index, IndexMut};
+use std::sync::{Arc, Mutex};
 
 pub fn knights_table_1(file: &str) -> i64 {
-    process(file)
+    process(file, None)
 }
 
 pub fn knights_table_2(file: &str) -> i64 {
-    process(file)
+    process(file, Some("Me"))
 }
 
-// make an array matrix
-impl_matrix!(GuestMatrix([i64; (10, 10)]));
-
-fn process(file: &str) -> i64 {
+fn process(file: &str, add: Option<&str>) -> i64 {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -38,9 +33,12 @@ fn process(file: &str) -> i64 {
     }
     guest_names.sort();
     guest_names.dedup();
-    println!("{:?}", guest_names);
+    if let Some(name) = add {
+        guest_names.push(name);
+    }
+    //println!("{:?}", guest_names);
 
-    let mut guest_data = GuestMatrix([0; 100]);
+    let mut guest_table = Matrix::zero(guest_names.len(), guest_names.len());
     for line in lines.iter() {
         let mut words = line.split_whitespace();
         let guest = words.next();
@@ -60,7 +58,7 @@ fn process(file: &str) -> i64 {
                             //print!("{}, ", g_idx);
                             if let Ok(a_idx) = guest_names.binary_search(&a.trim_matches('.')) {
                                 //println!("{}", a_idx);
-                                guest_data[(g_idx, a_idx)] = num;
+                                guest_table[(g_idx, a_idx)] = num;
                             }
                         }
                     }
@@ -68,43 +66,56 @@ fn process(file: &str) -> i64 {
             }
         }
     }
-    println!("{:?}", guest_data);
+    //println!("{:?}", guest_table);
 
-//    // numeric version of the Rosenbrock function
-//    let function =
-//        NumericalDifferentiation::new(Func(|g_rule: &[f64]| {
-//            30.0
-//    }));
-//
-//    let minimizer = GradientDescent::new();
-//
-//    let solution = minimizer.minimize(&function, guests);
-
-
-    let hive = HiveBuilder::<GuestMatrix>::new(guest_data, 5)
-                .set_threads(5)
-                        .set_scaling(scaling::power_rank(10_f64));
+    let hive = HiveBuilder::<Ctx<i64>>::new(Ctx { m: guest_table }, 5)
+        .set_threads(4)
+        .set_scaling(scaling::
+                     //power(10_f64) // causes error in hive.rs:273
+                     power_rank(10_f64)
+                     //proportionate() // causes error in hive.rs:273
+                     //rank()
+                    );
     let best_after_1000 = hive.build().unwrap().run_for_rounds(1_000);
-    println!("{:?}", best_after_1000);
-    best_after_1000.expect("Error in hive threading.").fitness as i64
+    let candidate = best_after_1000.expect("Error in hive threading.");
+    candidate.solution.iter()
+        .filter_map(|&i| guest_names.get(i))
+        //.inspect(|s| print!("{:?} ", s))
+        .cloned()
+        .collect::<Vec<&str>>();
+    //println!("{:?}", candidate);
+    candidate.fitness as i64
 }
 
-impl Context for GuestMatrix {
-    type Solution = [usize; 10];
+// Wrap matrix to allow impl Context
+struct Ctx<T> {
+    m: Matrix<T>,
+}
+
+impl Context for Ctx<i64> {
+    type Solution = Arc<Vec<usize>>;
 
     // Generates random guest seating arrangement
     fn make(&self) -> Self::Solution {
         let mut rng = thread_rng();
-        let mut idxs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let mut idxs = (0..self.m.row()).collect::<Vec<usize>>();
         rng.shuffle(&mut idxs);
         //print!("{:?} ", idxs);
-        idxs
+        Arc::new(idxs)
     }
 
     // Calculate total change in happiness for the solution
     fn evaluate_fitness(&self, solution: &Self::Solution) -> f64 {
-        // TODO add window for (last_idx, first_idx) somehow
-        solution.windows(2)
+        let mut sum = 0;
+        //let mut sums = Vec::new();
+        let first = solution[0];
+        let last = solution[solution.len() - 1];
+        let h_mod_first_last = self.m[(last, first)] + self.m[(first, last)];
+        //println!("({}, {}): {}", last, first, self[(last, first)]);
+        //println!("({}, {}): {}", first, last, self[(first, last)]);
+        //sums.push(h_mod_first_last);
+        sum += h_mod_first_last ;
+        for (&r, &c) in solution.windows(2)
             //.inspect(|i| println!("{:?}", i))
             .filter_map(|i| {
                 if let Some(a) = i.first() {
@@ -117,24 +128,34 @@ impl Context for GuestMatrix {
                     None
                 }
             })
-            //.inspect(|i| println!("{:?}", i))
-            .fold(0, |acc, (&r, &c)| {
-                acc + self[(r, c)]
-            }) as f64
+            //.inspect(|&(&i, &j)| {
+            //    println!("({}, {}): {}", i, j, self[(i, j)]);
+            //    println!("({}, {}): {}", j, i, self[(j, i)]);
+            //})
+        {
+            let happiness_modifier = self.m[(r, c)] + self.m[(c, r)];
+            //sums.push(happiness_modifier);
+            sum += happiness_modifier;
+        }
+        //println!("[{}] {:?}", sum, solution);
+        //println!("{:?}", sums);
+        //println!("");
+        sum as f64
     }
 
     // Swaps two randomly selected guest seat placement generating a "nearby" solution
     fn explore(&self, field: &[Candidate<Self::Solution>], n: usize) -> Self::Solution {
         //println!("{:?}", field);
+        let ref solution = *field[n].solution;
         let mut rng = thread_rng();
         let mut a = 0;
         let mut b = 0;
         while a == b {
-            a = rng.gen_range(0, 9);
-            b = rng.gen_range(0, 9);
+            a = rng.gen_range(0, solution.len() - 1);
+            b = rng.gen_range(0, solution.len() - 1);
         }
-        let mut nearby_solution = field[n].solution.clone();
+        let mut nearby_solution = solution.clone();
         nearby_solution.swap(a, b);
-        nearby_solution
+        Arc::new(nearby_solution)
     }
 }

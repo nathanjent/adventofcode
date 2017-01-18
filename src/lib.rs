@@ -1,11 +1,9 @@
 extern crate regex;
 extern crate md5;
-extern crate optimization;
+extern crate generic_matrix;
 extern crate abc;
 extern crate rand;
 extern crate num;
-
-#[macro_use] extern crate array_matrix;
 
 // 2015
 pub mod day01;
