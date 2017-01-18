@@ -41,14 +41,12 @@ fn process(file: &str, seconds: usize) -> i64 {
             }
         }
     }
-    //reindeer.sort();
-    //reindeer.dedup();
     println!("{:?}", reindeer);
 
     let mut racers = HashMap::new();
     for time in 0..seconds {
-        println!("{:?}", racers);
-        println!("{}", time + 1);
+        //println!("{:?}", racers);
+        print!("{:4}, ", time + 1);
         for rd in reindeer.iter() {
             let racer = racers.entry(&rd.name)
                 .or_insert(Racer::default());
@@ -69,7 +67,7 @@ fn process(file: &str, seconds: usize) -> i64 {
                     }
                 },
             };
-            print!("{} {}, ", rd.name, racer.distance);
+            print!("{} {:4}, ", rd.name, racer.distance);
         }
         println!("");
     }
