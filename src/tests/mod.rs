@@ -183,17 +183,17 @@ fn day13test2() {
 
 #[test]
 fn day14test_base() {
-    assert_eq!(day14::reindeer_olympics_1("input/day14_base.txt", 1000), 0);
+    assert_eq!(day14::reindeer_olympics_1("input/day14_base.txt", 1000), 1120);
 }
 
 #[test]
 fn day14test1() {
-    assert_eq!(day14::reindeer_olympics_1("input/day14.txt", 2503), 0);
+    assert_eq!(day14::reindeer_olympics_1("input/day14.txt", 2503), 2696);
 }
 
 #[test]
 fn day14test2() {
-    assert_eq!(day14::reindeer_olympics_2("input/day14.txt", 1), 0);
+    assert_eq!(day14::reindeer_olympics_2("input/day14.txt", 2503), 1084);
 }
 
 // 2016
