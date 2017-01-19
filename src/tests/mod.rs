@@ -199,7 +199,7 @@ fn day14test2() {
 
 #[test]
 fn day15test1() {
-    assert_eq!(day15::hungry_science_1("input/day15.txt"), 0);
+    assert_eq!(day15::hungry_science_1("input/day15.txt"), 222870);
 }
 
 #[test]

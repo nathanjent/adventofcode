@@ -8,14 +8,14 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 pub fn hungry_science_1(file: &str) -> i32 {
-    process(file)
+    process(file, None)
 }
 
 pub fn hungry_science_2(file: &str) -> i32 {
-    process(file)
+    process(file, Some(500))
 }
 
-fn process(file: &str) -> i32 {
+fn process(file: &str, consider_calories: Option<i32>) -> i32 {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -59,13 +59,17 @@ fn process(file: &str) -> i32 {
     }
     println!("{:?}", ingredients);
 
-    let hive = HiveBuilder::<Ctx<String, Ingredient>>::new(Ctx { m: ingredients }, 5)
-        .set_threads(1)
+    let ctx = Ctx {
+        m: ingredients,
+        consider_calories: consider_calories,
+    };
+    let hive = HiveBuilder::<Ctx<String, Ingredient>>::new(ctx, 5)
+        .set_threads(5)
         .set_scaling(scaling::
                      //power(10_f64) // causes error in hive.rs:273
-                     power_rank(10_f64)
+                     //power_rank(10_f64)
                      //proportionate() // causes error in hive.rs:273
-                     //rank()
+                     rank()
                     );
     let best_after_1000 = hive.build().unwrap().run_for_rounds(10_000);
     let candidate = best_after_1000.expect("Error in hive threading.");
@@ -80,6 +84,7 @@ fn process(file: &str) -> i32 {
 
 struct Ctx<S, T> {
     m: HashMap<S, T>,
+    consider_calories: Option<i32>,
 }
 
 impl Context for Ctx<String, Ingredient> {
@@ -114,19 +119,29 @@ impl Context for Ctx<String, Ingredient> {
             total.durability += props.durability * part;
             total.flavor += props.flavor * part;
             total.texture += props.texture * part;
+            total.calories += props.calories * part;
         }
         //println!("Total {:?}", total);
-        if total.capacity < 0 || total.durability < 0
-            || total.flavor < 0 || total.texture < 0 {
-            0.0
-        } else {
-            (total.capacity * total.durability * total.flavor * total.texture) as f64
+
+        if total.capacity < 0 || total.durability < 0 || total.flavor < 0 || total.texture < 0 {
+            return 0.0
+        }
+        let score = total.capacity * total.durability * total.flavor * total.texture;
+        match self.consider_calories {
+            Some(expected) => {
+                if total.calories == expected {
+                    score as f64
+                } else {
+                    0.0
+                }
+            },
+            None => score as f64,
         }
     }
 
     // Swaps two randomly selected solution points generating a "nearby" solution
     fn explore(&self, field: &[Candidate<Self::Solution>], n: usize) -> Self::Solution {
-        println!("{:?}", field[n].solution);
+        //println!("{:?}", field[n].solution);
         let ref solution = *field[n].solution;
         let mut rng = thread_rng();
         let mut a = 0;
@@ -136,21 +151,36 @@ impl Context for Ctx<String, Ingredient> {
             a = rng.gen_range(0, solution.len() - 1);
             b = rng.gen_range(0, solution.len() - 1);
         }
-        let adjustment = rng.gen_range(1, 3);
+        let adjustment = rng.gen_range(1, 2);
         nearby_solution[a] += adjustment;
         nearby_solution[b] -= adjustment;
-        println!("{:?}", nearby_solution);
+        //println!("{:?}", nearby_solution);
         Arc::new(nearby_solution)
     }
 }
 
 fn distribution_gen<'d>(d: &'d mut [i32]) {
     let mut rng = thread_rng();
-    loop {
-        let i = rng.gen_range(0, d.len());
-        d[i] += 1;
-        if d.iter().fold(0, |sum, n| sum + n) == 100 { break }
+    let mut idx_iter = (0..d.len()).cycle();
+    let mut sum = 0;
+    if let Some(idx) = idx_iter.nth(rng.gen_range(3, 7)) {
+        d[idx] = rng.gen_range(0, 100);
+        sum += d[idx];
+        for _ in 1..(d.len() - 1) {
+            //println!("d: {:?}", d);
+            if let Some(i) = idx_iter.next() {
+                //println!("sum: {}", sum);
+                let high = 100 - sum;
+                d[i] = if high > 0 { rng.gen_range(0, high) } else { 0 };
+                sum += d[i];
+            }
+        }
     }
+    if let Some(i) = idx_iter.next() {
+        d[i] = 100 - sum;
+    }
+    //println!("d: {:?}", d);
+    assert!(d.iter().inspect(|&&n| assert!(n >= 0)).fold(0, |sum, n| sum + n) == 100);
 }
 
 #[derive(Debug)]
