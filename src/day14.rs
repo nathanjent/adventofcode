@@ -46,7 +46,7 @@ fn process(file: &str, seconds: usize) -> (i64, i64) {
 //    println!("{:?}", reindeer);
 
     let mut racers = HashMap::new();
-    for time in 0..seconds {
+    for _ in 0..seconds {
         //println!("{:?}", racers);
         //print!("{:4}, ", time + 1);
         for rd in reindeer.iter() {
