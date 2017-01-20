@@ -4,6 +4,8 @@ extern crate generic_matrix;
 extern crate abc;
 extern crate rand;
 extern crate num;
+extern crate rusty_machine;
+extern crate cogset;
 
 // 2015
 pub mod day01;
