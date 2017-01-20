@@ -57,28 +57,22 @@ fn process(file: &str, consider_calories: Option<i32>) -> i32 {
             }
         }
     }
-    println!("{:?}", ingredients);
+    //println!("{:?}", ingredients);
 
     let ctx = Ctx {
         m: ingredients,
         consider_calories: consider_calories,
     };
     let hive = HiveBuilder::<Ctx<String, Ingredient>>::new(ctx, 5)
-        .set_threads(5)
+        .set_threads(8)
         .set_scaling(scaling::
                      //power(10_f64) // causes error in hive.rs:273
-                     //power_rank(10_f64)
+                     power_rank(10_f64)
                      //proportionate() // causes error in hive.rs:273
-                     rank()
+                     //rank()
                     );
-    let best_after_1000 = hive.build().unwrap().run_for_rounds(10_000);
-    let candidate = best_after_1000.expect("Error in hive threading.");
-    //candidate.solution.iter()
-    //    .filter_map(|&i| guest_names.get(i))
-    //    .inspect(|s| print!("{:?} ", s))
-    //    .cloned()
-    //    .collect::<Vec<&str>>();
-    //println!("{:?}", candidate);
+    let best = hive.build().unwrap().run_for_rounds(50_000);
+    let candidate = best.expect("Error in hive threading.");
     candidate.fitness as i32
 }
 
@@ -121,15 +115,17 @@ impl Context for Ctx<String, Ingredient> {
             total.texture += props.texture * part;
             total.calories += props.calories * part;
         }
-        //println!("Total {:?}", total);
 
-        if total.capacity < 0 || total.durability < 0 || total.flavor < 0 || total.texture < 0 {
+        if total.capacity < 0 || total.durability < 0
+            || total.flavor < 0 || total.texture < 0 {
             return 0.0
         }
         let score = total.capacity * total.durability * total.flavor * total.texture;
         match self.consider_calories {
             Some(expected) => {
                 if total.calories == expected {
+                    //println!("Total {:?}", total);
+                    //println!("Score {:?}", score);
                     score as f64
                 } else {
                     0.0
