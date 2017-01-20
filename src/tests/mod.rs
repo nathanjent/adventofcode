@@ -13,6 +13,7 @@ use day12;
 use day13;
 use day14;
 use day15;
+use day16;
 
 use day01_2016;
 use day02_2016;
@@ -205,6 +206,16 @@ fn day15test1() {
 #[test]
 fn day15test2() {
     assert_eq!(day15::hungry_science_2("input/day15.txt"), 117936);
+}
+
+#[test]
+fn day16test1() {
+    assert_eq!(day16::aunt_sue_1("input/day16.txt"), 0);
+}
+
+#[test]
+fn day16test2() {
+    assert_eq!(day16::aunt_sue_2("input/day16.txt"), 0);
 }
 
 // 2016

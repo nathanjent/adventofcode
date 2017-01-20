@@ -21,6 +21,7 @@ pub mod day12;
 pub mod day13;
 pub mod day14;
 pub mod day15;
+pub mod day16;
 
 // 2016
 pub mod day01_2016;
