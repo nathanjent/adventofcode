@@ -84,7 +84,7 @@ struct Ctx<S, T> {
 impl Context for Ctx<String, Ingredient> {
     type Solution = Arc<Vec<i32>>;
 
-    // Generates random guest seating arrangement
+    // Generates random distribution
     fn make(&self) -> Self::Solution {
         let mut distribution = vec![0; self.m.len()];
         //println!("{:?}", distribution);
@@ -93,7 +93,7 @@ impl Context for Ctx<String, Ingredient> {
         Arc::new(distribution)
     }
 
-    // Calculate total change in happiness for the solution
+    // Calculate score
     fn evaluate_fitness(&self, solution: &Self::Solution) -> f64 {
         let mut total = Ingredient {
             capacity: 0,

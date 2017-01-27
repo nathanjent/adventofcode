@@ -210,7 +210,7 @@ fn day15test2() {
 
 #[test]
 fn day16test1() {
-    assert_eq!(day16::aunt_sue_1("input/day16.txt"), 0);
+    assert_eq!(day16::aunt_sue_1("input/day16.txt"), 40);
 }
 
 #[test]
