@@ -8,14 +8,14 @@ use std::collections::HashMap;
 use std::str;
 
 pub fn aunt_sue_1(file: &str) -> i32 {
-    process(file)
+    process(file, false)
 }
 
 pub fn aunt_sue_2(file: &str) -> i32 {
-    process(file)
+    process(file, true)
 }
 
-fn process(file: &str) -> i32 {
+fn process(file: &str, part2: bool) -> i32 {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -75,6 +75,7 @@ fn process(file: &str) -> i32 {
     let ctx = Ctx {
         m: sues,
         t: test_sue,
+        part2: part2,
     };
     let hive = HiveBuilder::<Ctx<usize, Sue>>::new(ctx, 5)
         .set_threads(8)
@@ -126,6 +127,7 @@ impl Sue {
 struct Ctx<S, T> {
     m: HashMap<S, T>,
     t: T,
+    part2: bool
 }
 
 impl Context for Ctx<usize, Sue> {
@@ -140,29 +142,54 @@ impl Context for Ctx<usize, Sue> {
     fn evaluate_fitness(&self, solution: &Self::Solution) -> f64 {
         let mut fitness = 100.0;
         if let Some(sue) = self.m.get(solution) {
+            if self.part2 {
+                if let Some(cats) = sue.cats {
+                    if cats <= self.t.cats.unwrap() {
+                        fitness -= 10.0;
+                    }
+                }
+                if let Some(pomeranians) = sue.pomeranians {
+                    if pomeranians >= self.t.pomeranians.unwrap() {
+                        fitness -= 10.0;
+                    }
+                }
+                if let Some(goldfish) = sue.goldfish {
+                    if goldfish >= self.t.goldfish.unwrap() {
+                        fitness -= 10.0;
+                    }
+                }
+                if let Some(trees) = sue.trees {
+                    if trees <= self.t.trees.unwrap() {
+                        fitness -= 10.0;
+                    }
+                }
+            } else {
+                if let Some(cats) = sue.cats {
+                    fitness -= (cats - self.t.cats.unwrap()).abs() as f64 / 100.0;
+                }
+                if let Some(pomeranians) = sue.pomeranians {
+                    fitness -= (pomeranians - self.t.pomeranians.unwrap()).abs() as f64
+                        / 100.0;
+                }
+                if let Some(goldfish) = sue.goldfish {
+                    fitness -= (goldfish - self.t.goldfish.unwrap()).abs() as f64
+                        / 100.0;
+                }
+                if let Some(trees) = sue.trees {
+                    fitness -= (trees - self.t.trees.unwrap()).abs() as f64 / 100.0;
+                }
+            }
             if let Some(children) = sue.children {
                 fitness -= (children - self.t.children.unwrap()).abs() as f64 / 100.0;
             }
-            if let Some(cats) = sue.cats {
-                fitness -= (cats - self.t.cats.unwrap()).abs() as f64 / 100.0;
-            }
             if let Some(samoyeds) = sue.samoyeds {
                 fitness -= (samoyeds - self.t.samoyeds.unwrap()).abs() as f64 / 100.0;
-            }
-            if let Some(pomeranians) = sue.pomeranians {
-                fitness -= (pomeranians - self.t.pomeranians.unwrap()).abs() as f64 / 100.0;
             }
             if let Some(akitas) = sue.akitas {
                 fitness -= (akitas - self.t.akitas.unwrap()).abs() as f64 / 100.0;
             }
             if let Some(vizslas) = sue.vizslas {
                 fitness -= (vizslas - self.t.vizslas.unwrap()).abs() as f64 / 100.0;
-            }
-            if let Some(goldfish) = sue.goldfish {
-                fitness -= (goldfish - self.t.goldfish.unwrap()).abs() as f64 / 100.0;
-            }
-            if let Some(trees) = sue.trees {
-                fitness -= (trees - self.t.trees.unwrap()).abs() as f64 / 100.0;
             }
             if let Some(cars) = sue.cars {
                 fitness -= (cars - self.t.cars.unwrap()).abs() as f64 / 100.0;
@@ -177,7 +204,7 @@ impl Context for Ctx<usize, Sue> {
     // Generate a "nearby" solution
     fn explore(&self, field: &[Candidate<Self::Solution>], n: usize) -> Self::Solution {
         let mut rng = thread_rng();
-        let m: isize = rng.gen_range(-5, 5);
+        let m: isize = rng.gen_range(-2, 2);
         //println!("{} + {} = {}", field[n].solution, m, field[n].solution as isize + m);
         let sol = field[n].solution as isize + m;
         if sol >= 0 {

@@ -215,7 +215,7 @@ fn day16test1() {
 
 #[test]
 fn day16test2() {
-    assert_eq!(day16::aunt_sue_2("input/day16.txt"), 0);
+    assert_eq!(day16::aunt_sue_2("input/day16.txt"), 241);
 }
 
 // 2016
