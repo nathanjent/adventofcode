@@ -5,7 +5,6 @@ extern crate abc;
 extern crate rand;
 extern crate num;
 extern crate rusty_machine;
-extern crate cogset;
 
 // 2015
 pub mod day01;
@@ -24,6 +23,8 @@ pub mod day13;
 pub mod day14;
 pub mod day15;
 pub mod day16;
+pub mod day17;
+pub mod day18;
 
 // 2016
 pub mod day01_2016;
