@@ -16,6 +16,7 @@ use day15;
 use day16;
 use day17;
 use day18;
+use day19;
 
 use day01_2016;
 use day02_2016;
@@ -253,6 +254,16 @@ fn day18test1() {
 #[test]
 fn day18test2() {
     assert_eq!(day18::yard_gif_2("input/day18.txt", 100), 781);
+}
+
+#[test]
+fn day19test1() {
+    assert_eq!(day19::rudolph_meds_1("input/day19.txt"), 0);
+}
+
+#[test]
+fn day19test2() {
+    assert_eq!(day19::rudolph_meds_2("input/day19.txt"), 0);
 }
 
 // 2016
