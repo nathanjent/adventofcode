@@ -242,17 +242,17 @@ fn day17test2() {
 
 #[test]
 fn day18test1base() {
-    assert_eq!(day18::yard_gif_1("input/day18_base.txt"), 4);
+    assert_eq!(day18::yard_gif_1("input/day18_base.txt", 4), 4);
 }
 
 #[test]
 fn day18test1() {
-    assert_eq!(day18::yard_gif_1("input/day18.txt"), 0);
+    assert_eq!(day18::yard_gif_1("input/day18.txt", 100), 768);
 }
 
 #[test]
 fn day18test2() {
-    assert_eq!(day18::yard_gif_2("input/day18.txt"), 0);
+    assert_eq!(day18::yard_gif_2("input/day18.txt", 100), 781);
 }
 
 // 2016
