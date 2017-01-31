@@ -26,7 +26,9 @@ fn process(file: &str) -> i32 {
         loop {
             if let Some(element) = words.next() {
                 if let Some(replacement_elem) = words.nth(1) {
-                    replacements.insert(element, replacement_elem);
+                    let replacement_list
+                        = replacements.entry(element).or_insert(Vec::new());
+                    replacement_list.push(replacement_elem);
                 } else {
                     med_molecule = element;
                 }
@@ -40,23 +42,29 @@ fn process(file: &str) -> i32 {
 
     let mut med_molecule_elements = Vec::new();
     let mut med_molecule_iter = med_molecule.chars();
+    let mut other = String::new();
     loop {
-        let mut other = Vec::new();
         if let Some(c) = med_molecule_iter.next() {
             let mut elem = format!("{}", c);
             if replacements.keys().any(|&k| k == elem) {
-                med_molecule_elements.append(&mut other);
+                if other.len() > 0 {
+                    med_molecule_elements.push(other);
+                    other = String::new();
+                }
                 med_molecule_elements.push(elem);
             } else if let Some(b) = med_molecule_iter.next() {
                 elem.push(b);
                 if replacements.keys().any(|&k| k == elem) {
-                    med_molecule_elements.append(&mut other);
+                    if other.len() > 0 {
+                        med_molecule_elements.push(other);
+                        other = String::new();
+                    }
                     med_molecule_elements.push(elem);
                 } else {
-                    other.push(elem);
+                    other.push_str(&*elem);
                 }
             } else {
-                other.push(elem);
+                other.push_str(&*elem);
             }
         } else {
             break
@@ -64,5 +72,14 @@ fn process(file: &str) -> i32 {
     }
     println!("{:?}", med_molecule_elements);
 
-    42
+    let mut count = 1;
+    for elem in med_molecule_elements {
+        let  mut combinations = 1;
+        if let Some(replacement_list) = replacements.get(&*elem) {
+            combinations = replacement_list.len();
+        }
+        count *= combinations;
+    }
+
+    count as i32
 }
