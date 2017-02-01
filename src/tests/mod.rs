@@ -340,7 +340,7 @@ fn day07_2016test1base() {
 
 #[test]
 fn day07_2016test1() {
-    assert_eq!(day07_2016::ip_7_1("input/day07_2016.txt"), 0);
+    assert_eq!(day07_2016::ip_7_1("input/day07_2016.txt"), 118);
 }
 
 #[test]

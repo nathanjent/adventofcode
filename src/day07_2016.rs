@@ -24,21 +24,30 @@ fn count_ips(file: &str) -> usize {
         let mut word = Vec::new();
         let mut inner = Vec::new();
         let mut outer = Vec::new();
+        let mut state = State::Out;
         for c in line.chars() {
             match c {
                 '[' => {
                     outer.push(word.iter().cloned().collect::<String>());
                     word.clear();
+                    state = State::In;
                 },
                 ']' => {
                     inner.push(word.iter().cloned().collect::<String>());
                     word.clear();
+                    state = State::Out;
                 },
                 _ => {
                     word.push(c);
                 },
             }
         }
+        match state {
+            State::In => inner.push(word.iter().cloned().collect::<String>()),
+            State::Out => outer.push(word.iter().cloned().collect::<String>()),
+        }
+        println!("inners: {:?}", inner);
+        println!("outers: {:?}", outer);
 
         let mut valid = true;
 
@@ -48,8 +57,9 @@ fn count_ips(file: &str) -> usize {
                 if let Some(c) = s.pop() {
                     if let Some(b) = s.pop() {
                         if let Some(a) = s.pop() {
-                            let abba_found = a == d && b == c && a != b;
+                            let abba_found = a != b && a == d && b == c;
                             if abba_found {
+                                // the IP also must not have an ABBA within any hypernet sequences
                                 println!("[{}{}{}{}] {}", a, b, c, d, abba_found);
                                 valid = false;
                                 break 'inner;
@@ -64,16 +74,17 @@ fn count_ips(file: &str) -> usize {
         }
 
         let mut abba_count = 0;
-        let mut s = outer.iter().flat_map(|s| s.chars()).collect::<String>();
-        //for mut s in outer {
+        //let mut s = outer.iter().flat_map(|s| s.chars()).collect::<String>();
+        for mut s in outer {
         println!("outer: {}", s);
         while let Some(d) = s.pop() {
             if let Some(c) = s.pop() {
                 if let Some(b) = s.pop() {
                     if let Some(a) = s.pop() {
-                        let abba_found = a == d && b == c && a != b;
-                        println!("{}{}{}{} {}", a, b, c, d, abba_found);
+                        let abba_found = a != b && a == d && b == c;
                         if abba_found {
+                            // supports TLS if it has an Autonomous Bridge Bypass Annotation
+                            println!("{}{}{}{} {}", a, b, c, d, abba_found);
                             abba_count += 1;
                         }
                         s.push(a);
@@ -83,7 +94,7 @@ fn count_ips(file: &str) -> usize {
                 s.push(c);
             }
         }
-        //}
+        }
 
         if valid && abba_count > 0 {
             println!("TLS Supported!");
@@ -93,4 +104,9 @@ fn count_ips(file: &str) -> usize {
         }
     }
     count
+}
+
+enum State {
+    In,
+    Out,
 }
