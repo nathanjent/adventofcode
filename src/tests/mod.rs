@@ -339,13 +339,18 @@ fn day07_2016test1base() {
 }
 
 #[test]
+fn day07_2016test2base() {
+    assert_eq!(day07_2016::ip_7_2("input/day07_2016_base2.txt"), 3);
+}
+
+#[test]
 fn day07_2016test1() {
     assert_eq!(day07_2016::ip_7_1("input/day07_2016.txt"), 118);
 }
 
 #[test]
 fn day07_2016test2() {
-    assert_eq!(day07_2016::ip_7_2("input/day07_2016.txt"), 0);
+    assert_eq!(day07_2016::ip_7_2("input/day07_2016.txt"), 260);
 }
 
 #[test]
