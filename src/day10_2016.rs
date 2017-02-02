@@ -19,138 +19,181 @@ fn parse_cmds(file: &str) -> usize {
         .filter_map(Result::ok);
 
     let mut bots = HashMap::new();
-    let mut out_bins = HashMap::new();
-
-    let (transfer_tokens, input_tokens): (Vec<Vec<Token>>, Vec<Vec<Token>>) = lines.map(|line| {
-            let mut words = line.split_whitespace();
-            let mut tokens = Vec::new();
-            loop {
-                if let Some(w) = words.next() {
-                    match w {
-                        "value" => {
-                            if let Some(v) = words.next() {
-                                if let Ok(n) = v.parse::<usize>() {
-                                    tokens.push(Token::Value(n))
+    let mut output_bins = HashMap::new();
+    let mut input_bins = HashMap::new();
+    for line in lines {
+        let mut words = line.split_whitespace();
+        loop {
+            if let Some(word) = words.next() {
+                match word {
+                    "value" => {
+                        if let Some(value) = words.next() {
+                            if let Ok(value) = value.parse::<usize>() {
+                                if let Some(id) = words.nth(3) {
+                                    if let Ok(id) = id.parse::<usize>() {
+                                        let input_bin = input_bins.entry(value).or_insert(InputBin::new());
+                                        input_bin.chip = Some(Microchip(value));
+                                        let bot = bots.entry(id).or_insert(Bot::new());
+                                        bot.get = GetInstruction {
+                                            from: Some(Entity::InputBin(value)),
+                                        };
+                                    }
                                 }
                             }
                         }
-                        "bot" => {
-                            if let Some(v) = words.next() {
-                                if let Ok(n) = v.parse::<usize>() {
-                                    tokens.push(Token::Bot(n))
+                    },
+                    "bot" => {
+                        if let Some(bot_id) = words.next() {
+                            if let Ok(bot_id) = bot_id.parse::<usize>() {
+                                if let Some(low) = words.nth(3) {
+                                    if let Some(low_id) = words.next() {
+                                        if let Ok(low_id) = low_id.parse::<usize>() {
+                                            if let Some(high) = words.nth(3) {
+                                                if let Some(high_id) = words.next() {
+                                                    if let Ok(high_id) = high_id.parse::<usize>() {
+                                                        match low {
+                                                            "bot" => {
+                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
+                                                                bot.put.low = Some(Entity::Bot(low_id));
+                                                            }
+                                                            "output" => {
+                                                                output_bins.entry(low_id).or_insert(OutputBin::new());
+                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
+                                                                bot.put.low = Some(Entity::OutputBin(low_id));
+                                                            }
+                                                            _ => {},
+                                                        };
+                                                        match high {
+                                                            "bot" => {
+                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
+                                                                bot.put.high = Some(Entity::Bot(high_id));
+                                                            }
+                                                            "output" => {
+                                                                output_bins.entry(high_id).or_insert(OutputBin::new());
+                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
+                                                                bot.put.high = Some(Entity::OutputBin(high_id));
+                                                            }
+                                                            _ => {},
+                                                        };
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
-                        "output" => {
-                            if let Some(v) = words.next() {
-                                if let Ok(n) = v.parse::<usize>() {
-                                    tokens.push(Token::Output(n))
-                                }
-                            }
-                        }
-                        _ => {}
-                    };
-                } else {
-                    return tokens;
+                    },
+                    _ => {},
                 }
+            } else {
+                break
             }
-        })
-        .partition(|ref t| t.len() > 2);
+        }
+    }
+    println!("{:?}", bots);
+    println!("{:?}", output_bins);
+    println!("{:?}", input_bins);
 
-    // Load MicroChips from input bins
-    input_tokens.iter().map(|tokens| {
-        let val;
-        match tokens[0] {
-            Token::Value(n) => val = MicroChip(n),
-            Token::Bot(_) => unreachable!(),
-            Token::Output(_) => unreachable!(),
-        }
-        match tokens[1] {
-            Token::Bot(n) => {
-                bots.insert(n, Bot { chips: vec![val] });
-            }
-            Token::Output(_) => unreachable!(),
-            Token::Value(_) => unreachable!(),
-        }
-    });
-
-    // Process transfers
-    transfer_tokens.iter().map(|tokens| {
-        let low;
-        let high;
-        match tokens[0] {
-            Token::Bot(n) => {
-                let bot = bots.entry(n).or_insert(Bot { chips: Vec::new() });
-                low = bot.low();
-                high = bot.high();
-            }
-            Token::Value(_) => unreachable!(),
-            Token::Output(_) => unreachable!(),
-        }
-        if let Some(low) = low {
-            match tokens[1] {
-                Token::Bot(n) => {
-                    let mut to = bots.entry(n).or_insert(Bot { chips: Vec::new() });
-                    if to.chips.len() > 0 {
-                        to.chips.push(low);
+    loop {
+        for bot_id in 0..bots.len() {
+            if let Some(mut bot) = bots.get_mut(&bot_id) {
+                let ref get = bot.get;
+                if let Some(Entity::InputBin(ref from)) = get.from {
+                    println!("{:?}", from);
+                    if let Some(input_bin) = input_bins.remove(&from) {
+                        if let Some(chip) = input_bin.chip {
+                            //TODO need to move chip from bin to bot, remove reference
+                            bot.chips.push(chip);
+                        }
                     }
                 }
-                Token::Output(n) => {
-                    let mut to = out_bins.entry(n).or_insert(OutputBin { chip: None });
-                    to.chip = Some(low);
+                println!("{}, {:?}", bot_id, bot);
+                if bot.chips.iter().any(|chip| {
+                    chip.0 == 61 || chip.0 == 17
+                }) {
+                    break
                 }
-                Token::Value(_) => unreachable!(),
             }
         }
-        if let Some(high) = high {
-            match tokens[2] {
-                Token::Bot(n) => {
-                    let mut to = bots.entry(n).or_insert(Bot { chips: Vec::new() });
-                    if to.chips.len() > 0 {
-                        to.chips.push(high);
-                    }
-                }
-                Token::Output(n) => {
-                    let mut to = out_bins.entry(n).or_insert(OutputBin { chip: None });
-                    to.chip = Some(high);
-                }
-                Token::Value(_) => unreachable!(),
-            }
-        }
-    });
+    }
 
     42
 }
 
+#[derive(Eq, PartialEq, PartialOrd, Ord, Clone, Debug)]
+struct Microchip(usize);
+
 #[derive(Debug)]
-enum Token {
-    Value(usize),
-    Bot(usize),
-    Output(usize),
+struct Bot {
+    chips: Vec<Microchip>,
+    get: GetInstruction,
+    put: PutInstruction,
 }
 
-#[derive(Eq, PartialEq, PartialOrd, Ord, Clone)]
-struct MicroChip(usize);
+#[derive(Debug)]
+struct GetInstruction {
+    from: Option<Entity>,
+}
 
-struct Bot {
-    chips: Vec<MicroChip>,
+#[derive(Debug)]
+struct PutInstruction {
+    low: Option<Entity>,
+    high: Option<Entity>,
+}
+
+#[derive(Debug)]
+struct InputBin {
+    chip: Option<Microchip>,
+}
+
+#[derive(Debug)]
+struct OutputBin {
+    chip: Option<Microchip>,
+}
+
+#[derive(Debug)]
+enum Entity {
+    Bot(usize),
+    OutputBin(usize),
+    InputBin(usize),
 }
 
 impl Bot {
-    fn low(&mut self) -> Option<MicroChip> {
+    fn new() -> Self {
+        Bot {
+            chips: Vec::new(),
+            get: GetInstruction {
+                from: None,
+            },
+            put: PutInstruction {
+                low: None,
+                high: None,
+            },
+        }
+    }
+
+    fn low(&mut self) -> Option<Microchip> {
         self.chips.iter().min().cloned()
     }
 
-    fn high(&mut self) -> Option<MicroChip> {
+    fn high(&mut self) -> Option<Microchip> {
         self.chips.iter().max().cloned()
     }
 }
 
-struct OutputBin {
-    chip: Option<MicroChip>,
+impl InputBin {
+    fn new() -> Self {
+        InputBin {
+            chip: None,
+        }
+    }
 }
 
-trait Entity {}
-
-impl Entity for Bot {}
-impl Entity for OutputBin {}
+impl OutputBin {
+    fn new() -> Self {
+        OutputBin {
+            chip: None,
+        }
+    }
+}
