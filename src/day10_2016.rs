@@ -95,6 +95,29 @@ fn parse_cmds(file: &str) -> usize {
     println!("{:?}", output_bins);
     println!("{:?}", input_bins);
 
+    loop {
+        for bot_id in 0..bots.len() {
+            if let Some(mut bot) = bots.get_mut(&bot_id) {
+                let ref get = bot.get;
+                if let Some(Entity::InputBin(ref from)) = get.from {
+                    println!("{:?}", from);
+                    if let Some(input_bin) = input_bins.remove(&from) {
+                        if let Some(chip) = input_bin.chip {
+                            //TODO need to move chip from bin to bot, remove reference
+                            bot.chips.push(chip);
+                        }
+                    }
+                }
+                println!("{}, {:?}", bot_id, bot);
+                if bot.chips.iter().any(|chip| {
+                    chip.0 == 61 || chip.0 == 17
+                }) {
+                    break
+                }
+            }
+        }
+    }
+
     42
 }
 
