@@ -34,9 +34,9 @@ fn parse_cmds(file: &str) -> usize {
                                         let input_bin = input_bins.entry(value).or_insert(InputBin::new());
                                         input_bin.chip = Some(Microchip(value));
                                         let bot = bots.entry(id).or_insert(Bot::new());
-                                        bot.get = GetInstruction {
+                                        bot.get.push(Get {
                                             from: Some(Entity::InputBin(value)),
-                                        };
+                                        });
                                     }
                                 }
                             }
@@ -51,30 +51,31 @@ fn parse_cmds(file: &str) -> usize {
                                             if let Some(high) = words.nth(3) {
                                                 if let Some(high_id) = words.next() {
                                                     if let Ok(high_id) = high_id.parse::<usize>() {
+                                                        let mut put = Put::new();
                                                         match low {
                                                             "bot" => {
-                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
-                                                                bot.put.low = Some(Entity::Bot(low_id));
+                                                                put.low = Some(Entity::Bot(low_id));
                                                             }
                                                             "output" => {
-                                                                output_bins.entry(low_id).or_insert(OutputBin::new());
-                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
-                                                                bot.put.low = Some(Entity::OutputBin(low_id));
+                                                                output_bins.entry(low_id)
+                                                                    .or_insert(OutputBin::new());
+                                                                put.low = Some(Entity::OutputBin(low_id));
                                                             }
                                                             _ => {},
                                                         };
                                                         match high {
                                                             "bot" => {
-                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
-                                                                bot.put.high = Some(Entity::Bot(high_id));
+                                                                put.high = Some(Entity::Bot(high_id));
                                                             }
                                                             "output" => {
-                                                                output_bins.entry(high_id).or_insert(OutputBin::new());
-                                                                let bot = bots.entry(bot_id).or_insert(Bot::new());
-                                                                bot.put.high = Some(Entity::OutputBin(high_id));
+                                                                output_bins.entry(high_id)
+                                                                    .or_insert(OutputBin::new());
+                                                                put.high = Some(Entity::OutputBin(high_id));
                                                             }
                                                             _ => {},
                                                         };
+                                                        let bot = bots.entry(bot_id).or_insert(Bot::new());
+                                                        bot.put.push(put);
                                                     }
                                                 }
                                             }
@@ -91,28 +92,35 @@ fn parse_cmds(file: &str) -> usize {
             }
         }
     }
-    println!("{:?}", bots);
-    println!("{:?}", output_bins);
-    println!("{:?}", input_bins);
+    //println!("{:?}", bots);
+    //println!("{:?}", output_bins);
+    //println!("{:?}", input_bins);
 
-    loop {
+    println!("{:?}", bots.len());
+    'instructions: loop {
         for bot_id in 0..bots.len() {
             if let Some(mut bot) = bots.get_mut(&bot_id) {
-                let ref get = bot.get;
-                if let Some(Entity::InputBin(ref from)) = get.from {
-                    println!("{:?}", from);
-                    if let Some(input_bin) = input_bins.remove(&from) {
-                        if let Some(chip) = input_bin.chip {
-                            //TODO need to move chip from bin to bot, remove reference
-                            bot.chips.push(chip);
+                //println!("{}, {:?}", bot_id, bot);
+                if let Some(ref mut get) = bot.get.pop() {
+                    println!("bot {} > {:?}", bot_id, get);
+                    if let Some(Entity::InputBin(ref from)) = get.from {
+                        if let Some(input_bin) = input_bins.remove(&from) {
+                            if let Some(chip) = input_bin.chip {
+                                bot.chips.push(chip);
+                            }
                         }
                     }
                 }
-                println!("{}, {:?}", bot_id, bot);
-                if bot.chips.iter().any(|chip| {
-                    chip.0 == 61 || chip.0 == 17
-                }) {
-                    break
+                if bot.chips.len() > 1 {
+                    if let Some(ref mut put) = bot.put.pop() {
+                        //TODO need to move chip from bot to another bot or output bin & remove reference
+                        println!("bot {} > {:?}", bot_id, put);
+                    }
+                }
+                if bot.chips.iter().any(|chip| chip.0 == 61)
+                    && bot.chips.iter().any(|chip| chip.0 == 17)
+                {
+                    break 'instructions
                 }
             }
         }
@@ -127,17 +135,17 @@ struct Microchip(usize);
 #[derive(Debug)]
 struct Bot {
     chips: Vec<Microchip>,
-    get: GetInstruction,
-    put: PutInstruction,
+    get: Vec<Get>,
+    put: Vec<Put>,
 }
 
 #[derive(Debug)]
-struct GetInstruction {
+struct Get {
     from: Option<Entity>,
 }
 
 #[derive(Debug)]
-struct PutInstruction {
+struct Put {
     low: Option<Entity>,
     high: Option<Entity>,
 }
@@ -163,13 +171,8 @@ impl Bot {
     fn new() -> Self {
         Bot {
             chips: Vec::new(),
-            get: GetInstruction {
-                from: None,
-            },
-            put: PutInstruction {
-                low: None,
-                high: None,
-            },
+            get: Vec::new(),
+            put: Vec::new(),
         }
     }
 
@@ -194,6 +197,15 @@ impl OutputBin {
     fn new() -> Self {
         OutputBin {
             chip: None,
+        }
+    }
+}
+
+impl Put {
+    fn new() -> Self {
+        Put {
+            low: None,
+            high: None,
         }
     }
 }
