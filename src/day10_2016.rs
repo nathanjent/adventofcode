@@ -96,13 +96,14 @@ fn parse_cmds(file: &str) -> usize {
     //println!("{:?}", output_bins);
     //println!("{:?}", input_bins);
 
-    println!("{:?}", bots.len());
+    //println!("{:?}", bots.len());
     'instructions: loop {
         for bot_id in 0..bots.len() {
+            let mut put_instruction = None;
             if let Some(mut bot) = bots.get_mut(&bot_id) {
                 //println!("{}, {:?}", bot_id, bot);
                 if let Some(ref mut get) = bot.get.pop() {
-                    println!("bot {} > {:?}", bot_id, get);
+                    println!("Instruction: bot {} > {:?}", bot_id, get);
                     if let Some(Entity::InputBin(ref from)) = get.from {
                         if let Some(input_bin) = input_bins.remove(&from) {
                             if let Some(chip) = input_bin.chip {
@@ -112,9 +113,8 @@ fn parse_cmds(file: &str) -> usize {
                     }
                 }
                 if bot.chips.len() > 1 {
-                    if let Some(ref mut put) = bot.put.pop() {
-                        //TODO need to move chip from bot to another bot or output bin & remove reference
-                        println!("bot {} > {:?}", bot_id, put);
+                    if let Some(put) = bot.put.pop() {
+                        put_instruction = Some(put);
                     }
                 }
                 if bot.chips.iter().any(|chip| chip.0 == 61)
@@ -123,6 +123,74 @@ fn parse_cmds(file: &str) -> usize {
                     break 'instructions
                 }
             }
+            if let Some(ref mut put) = put_instruction {
+                println!("Instruction: bot {} > {:?}", bot_id, put);
+                if let Some(ref low) = put.low {
+                    match *low {
+                        Entity::Bot(other_bot_id) => {
+                            let mut chip = None;
+                            if let Some(mut bot) = bots.get_mut(&bot_id) {
+                                println!("Bot {}, {:?}", bot_id, bot);
+                                chip = bot.low();
+                                println!("Bot {}, {:?}", bot_id, bot);
+                            }
+                            if let Some(mut other_bot) = bots.get_mut(&other_bot_id) {
+                                if let Some(chip) = chip {
+                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                    other_bot.chips.push(chip);
+                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                }
+                            }
+                        },
+                        Entity::OutputBin(out_id) => {
+                            if let Some(mut out) = output_bins.get_mut(&out_id) {
+                                if let Some(mut bot) = bots.get_mut(&bot_id) {
+                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                    println!("Out {}, {:?}", bot_id, bot);
+                                    out.chip = bot.low();
+                                    println!("Out {}, {:?}", bot_id, bot);
+                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                }
+                            }
+                        },
+                        Entity::InputBin(_) => {},
+                    }
+                }
+                if let Some(ref high) = put.high {
+                    match *high {
+                        Entity::Bot(other_bot_id) => {
+                            let mut chip = None;
+                            if let Some(mut bot) = bots.get_mut(&bot_id) {
+                                println!("Bot {}, {:?}", bot_id, bot);
+                                chip = bot.high();
+                                println!("Bot {}, {:?}", bot_id, bot);
+                            }
+                            if let Some(mut other_bot) = bots.get_mut(&other_bot_id) {
+                                if let Some(chip) = chip {
+                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                    other_bot.chips.push(chip);
+                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                }
+                            }
+                        },
+                        Entity::OutputBin(out_id) => {
+                            if let Some(mut out) = output_bins.get_mut(&out_id) {
+                                if let Some(mut bot) = bots.get_mut(&bot_id) {
+                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                    println!("Out {}, {:?}", bot_id, bot);
+                                    out.chip = bot.high();
+                                    println!("Out {}, {:?}", bot_id, bot);
+                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                }
+                            }
+                        },
+                        Entity::InputBin(_) => {},
+                    }
+                }
+            }
+        }
+        if output_bins.values().all(|out| out.chip.is_some()) {
+            break 'instructions
         }
     }
 
@@ -177,11 +245,31 @@ impl Bot {
     }
 
     fn low(&mut self) -> Option<Microchip> {
-        self.chips.iter().min().cloned()
+        let mut index = 0;
+        match self.chips.iter()
+            .enumerate()
+            .min_by_key(|&(_, c)| {
+                c.0
+            })
+        {
+            Some((i, _)) => index = i,
+            None => {},
+        }
+        Some(self.chips.swap_remove(index))
     }
 
     fn high(&mut self) -> Option<Microchip> {
-        self.chips.iter().max().cloned()
+        let mut index = 0;
+        match self.chips.iter()
+            .enumerate()
+            .max_by_key(|&(_, c)| {
+                c.0
+            })
+        {
+            Some((i, _)) => index = i,
+            None => {},
+        }
+        Some(self.chips.swap_remove(index))
     }
 }
 
