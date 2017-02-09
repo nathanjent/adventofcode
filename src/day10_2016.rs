@@ -5,14 +5,14 @@ use std::collections::HashMap;
 use std::ops::Mul;
 
 pub fn balance_bots_1(file: &str) -> usize {
-    parse_cmds(file)
+    parse_cmds(file, Some((61, 17)))
 }
 
 pub fn balance_bots_2(file: &str) -> usize {
-    parse_cmds(file)
+    parse_cmds(file, None)
 }
 
-fn parse_cmds(file: &str) -> usize {
+fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -122,10 +122,12 @@ fn parse_cmds(file: &str) -> usize {
             if let Some(ref mut put) = put_instruction {
                 println!("Instruction: bot {} > {:?}", bot_id, put);
                 if let Some(bot) = bots.get(&bot_id) {
-                    if bot.chips.iter().any(|chip| chip.0 == 61)
-                        && bot.chips.iter().any(|chip| chip.0 == 17)
-                    {
-                        return bot_id;
+                    if let Some((a, b)) = chip_pair {
+                        if bot.chips.iter().any(|chip| chip.0 == a)
+                            && bot.chips.iter().any(|chip| chip.0 == b)
+                        {
+                            return bot_id;
+                        }
                     }
                 }
                 if let Some(ref low) = put.low {
@@ -197,15 +199,18 @@ fn parse_cmds(file: &str) -> usize {
             }
         }
         if output_bins.values().all(|out| out.chips.len() > 0) {
+            for (k, v) in output_bins.iter() {
+                println!("{:?}: {:?}", k, v);
+            }
+            if let Some(&OutputBin { chips: ref c0 } ) = output_bins.get(&0) {
+                if let Some(&OutputBin { chips: ref c1 } ) = output_bins.get(&1) {
+                    if let Some(&OutputBin { chips: ref c2 } ) = output_bins.get(&2) {
+                        return (c0[0].clone() * c1[0].clone() * c2[0].clone()).0
+                    }
+                }
+            }
             // TODO need a better break test
             break 'instructions
-        }
-    }
-    if let Some(&OutputBin { chips: ref c0 } ) = output_bins.get(&0) {
-        if let Some(&OutputBin { chips: ref c1 } ) = output_bins.get(&1) {
-            if let Some(&OutputBin { chips: ref c2 } ) = output_bins.get(&2) {
-                return (c0[0].clone() * c1[0].clone() * c2[0].clone()).0
-            }
         }
     }
     42
