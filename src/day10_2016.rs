@@ -32,7 +32,8 @@ fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
                             if let Ok(value) = value.parse::<usize>() {
                                 if let Some(id) = words.nth(3) {
                                     if let Ok(id) = id.parse::<usize>() {
-                                        let input_bin = input_bins.entry(value).or_insert(InputBin::new());
+                                        let input_bin = input_bins.entry(value)
+                                            .or_insert(InputBin::new());
                                         input_bin.chip = Some(Microchip(value));
                                         let bot = bots.entry(id).or_insert(Bot::new());
                                         bot.get.push(Get {
@@ -55,12 +56,14 @@ fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
                                                         let mut put = Put::new();
                                                         match low {
                                                             "bot" => {
-                                                                put.low = Some(Entity::Bot(low_id));
+                                                                put.low
+                                                                    = Some(Entity::Bot(low_id));
                                                             }
                                                             "output" => {
                                                                 output_bins.entry(low_id)
                                                                     .or_insert(OutputBin::new());
-                                                                put.low = Some(Entity::OutputBin(low_id));
+                                                                put.low
+                                                                    = Some(Entity::OutputBin(low_id));
                                                             }
                                                             _ => {},
                                                         };
@@ -98,13 +101,15 @@ fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
     //println!("{:?}", input_bins);
 
     //println!("{:?}", bots.len());
+    let mut idle = 1;
     'instructions: loop {
         for bot_id in 0..bots.len() {
             let mut put_instruction = None;
             if let Some(mut bot) = bots.get_mut(&bot_id) {
                 //println!("{}, {:?}", bot_id, bot);
                 if let Some(ref mut get) = bot.get.pop() {
-                    println!("Instruction: bot {} > {:?}", bot_id, get);
+                    //println!("Instruction: bot {} > {:?}", bot_id, get);
+                    idle += 1;
                     if let Some(Entity::InputBin(ref from)) = get.from {
                         if let Some(input_bin) = input_bins.remove(&from) {
                             if let Some(chip) = input_bin.chip {
@@ -120,7 +125,8 @@ fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
                 }
             }
             if let Some(ref mut put) = put_instruction {
-                println!("Instruction: bot {} > {:?}", bot_id, put);
+                idle += 1;
+                //println!("Instruction: bot {} > {:?}", bot_id, put);
                 if let Some(bot) = bots.get(&bot_id) {
                     if let Some((a, b)) = chip_pair {
                         if bot.chips.iter().any(|chip| chip.0 == a)
@@ -135,28 +141,28 @@ fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
                         Entity::Bot(other_bot_id) => {
                             let mut chip = None;
                             if let Some(mut bot) = bots.get_mut(&bot_id) {
-                                println!("Bot {}, {:?}", bot_id, bot);
+                                //println!("Bot {}, {:?}", bot_id, bot);
                                 chip = bot.low();
-                                println!("Bot {}, {:?}", bot_id, bot);
+                                //println!("Bot {}, {:?}", bot_id, bot);
                             }
                             if let Some(mut other_bot) = bots.get_mut(&other_bot_id) {
                                 if let Some(chip) = chip {
-                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                    //println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
                                     other_bot.chips.push(chip);
-                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                    //println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
                                 }
                             }
                         },
                         Entity::OutputBin(out_id) => {
                             if let Some(mut out) = output_bins.get_mut(&out_id) {
                                 if let Some(mut bot) = bots.get_mut(&bot_id) {
-                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
-                                    println!("Out {}, {:?}", bot_id, bot);
+                                    //println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                    //println!("Out {}, {:?}", bot_id, bot);
                                     if let Some(chip) = bot.low() {
                                         out.chips.push(chip);
                                     }
-                                    println!("Out {}, {:?}", bot_id, bot);
-                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                    //println!("Out {}, {:?}", bot_id, bot);
+                                    //println!("Receiver OutputBin {}, {:?}", out_id, out);
                                 }
                             }
                         },
@@ -168,28 +174,28 @@ fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
                         Entity::Bot(other_bot_id) => {
                             let mut chip = None;
                             if let Some(mut bot) = bots.get_mut(&bot_id) {
-                                println!("Bot {}, {:?}", bot_id, bot);
+                                //println!("Bot {}, {:?}", bot_id, bot);
                                 chip = bot.high();
-                                println!("Bot {}, {:?}", bot_id, bot);
+                                //println!("Bot {}, {:?}", bot_id, bot);
                             }
                             if let Some(mut other_bot) = bots.get_mut(&other_bot_id) {
                                 if let Some(chip) = chip {
-                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                    //println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
                                     other_bot.chips.push(chip);
-                                    println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
+                                    //println!("Receiver Bot {}, {:?}", other_bot_id, other_bot);
                                 }
                             }
                         },
                         Entity::OutputBin(out_id) => {
                             if let Some(mut out) = output_bins.get_mut(&out_id) {
                                 if let Some(mut bot) = bots.get_mut(&bot_id) {
-                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
-                                    println!("Out {}, {:?}", bot_id, bot);
+                                    //println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                    //println!("Out {}, {:?}", bot_id, bot);
                                     if let Some(chip) = bot.high() {
                                         out.chips.push(chip);
                                     }
-                                    println!("Out {}, {:?}", bot_id, bot);
-                                    println!("Receiver OutputBin {}, {:?}", out_id, out);
+                                    //println!("Out {}, {:?}", bot_id, bot);
+                                    //println!("Receiver OutputBin {}, {:?}", out_id, out);
                                 }
                             }
                         },
@@ -198,19 +204,19 @@ fn parse_cmds(file: &str, chip_pair: Option<(usize, usize)>) -> usize {
                 }
             }
         }
-        if output_bins.values().all(|out| out.chips.len() > 0) {
-            for (k, v) in output_bins.iter() {
-                println!("{:?}: {:?}", k, v);
-            }
-            if let Some(&OutputBin { chips: ref c0 } ) = output_bins.get(&0) {
-                if let Some(&OutputBin { chips: ref c1 } ) = output_bins.get(&1) {
-                    if let Some(&OutputBin { chips: ref c2 } ) = output_bins.get(&2) {
-                        return (c0[0].clone() * c1[0].clone() * c2[0].clone()).0
-                    }
-                }
-            }
-            // TODO need a better break test
+        if idle == 0 {
             break 'instructions
+        }
+        idle -= 1;
+    }
+    //for (k, v) in output_bins.iter() {
+    //    println!("{:?}: {:?}", k, v);
+    //}
+    if let Some(&OutputBin { chips: ref c0 } ) = output_bins.get(&0) {
+        if let Some(&OutputBin { chips: ref c1 } ) = output_bins.get(&1) {
+            if let Some(&OutputBin { chips: ref c2 } ) = output_bins.get(&2) {
+                return (c0[0].clone() * c1[0].clone() * c2[0].clone()).0
+            }
         }
     }
     42
