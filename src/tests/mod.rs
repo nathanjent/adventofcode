@@ -392,13 +392,13 @@ fn day09_2016test2() {
 }
 
 #[test]
-fn day10_2016test1base() {
+fn day10_2016test_base() {
     assert_eq!(day10_2016::balance_bots_1("input/day10_2016_base.txt"), 0);
 }
 
 #[test]
 fn day10_2016test1() {
-    assert_eq!(day10_2016::balance_bots_1("input/day10_2016.txt"), 0);
+    assert_eq!(day10_2016::balance_bots_1("input/day10_2016.txt"), 147);
 }
 
 #[test]
