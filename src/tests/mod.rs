@@ -257,6 +257,11 @@ fn day18test2() {
 }
 
 #[test]
+fn day19test_base1() {
+    assert_eq!(day19::rudolph_meds_1("input/day19_base.txt"), 4);
+}
+
+#[test]
 fn day19test1() {
     assert_eq!(day19::rudolph_meds_1("input/day19.txt"), 0);
 }

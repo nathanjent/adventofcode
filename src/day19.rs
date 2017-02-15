@@ -1,17 +1,17 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-pub fn rudolph_meds_1(file: &str) -> i32 {
+pub fn rudolph_meds_1(file: &str) -> usize {
     process(file)
 }
 
-pub fn rudolph_meds_2(file: &str) -> i32 {
+pub fn rudolph_meds_2(file: &str) -> usize {
     process(file)
 }
 
-fn process(file: &str) -> i32 {
+fn process(file: &str) -> usize {
     let input = File::open(file).expect("File open fail.");
     let reader = BufReader::new(input);
 
@@ -37,8 +37,10 @@ fn process(file: &str) -> i32 {
             }
         }
     }
-    println!("{:?}", replacements);
     println!("{:?}", med_molecule);
+    for (k, replacement_list) in replacements.iter() {
+        println!("{:?} {:?}", k, replacement_list);
+    }
 
     let mut med_molecule_elements = Vec::new();
     let mut med_molecule_iter = med_molecule.chars();
@@ -72,14 +74,40 @@ fn process(file: &str) -> i32 {
     }
     println!("{:?}", med_molecule_elements);
 
-    let mut count = 1;
-    for elem in med_molecule_elements {
-        let  mut combinations = 1;
-        if let Some(replacement_list) = replacements.get(&*elem) {
-            combinations = replacement_list.len();
+    let mut molecules = HashSet::new();
+    for (elem, replacement_list) in replacements.iter() {
+        for replacement in replacement_list {
+            let elements = med_molecule_elements.clone();
+            let mut element_iter = med_molecule_elements.iter().enumerate();
+            loop {
+                let mut index = None;
+                if let Some((i, e)) = element_iter.next() {
+                    if e == elem {
+                        index = Some(i);
+                    }
+                } else {
+                    break
+                }
+                if let Some(index) = index {
+                    let s: String = elements.iter()
+                        .enumerate()
+                        .map(|(i, e)| {
+                            if i == index {
+                                replacement.clone()
+                            } else {
+                                e
+                            }
+                        })
+                    .collect();
+                    println!("{} {:?} {:?}", index, replacement, s);
+                    molecules.insert(s);
+                }
+            }
         }
-        count *= combinations;
+    }
+    for molecule in molecules.iter() {
+        println!("{:?}", molecule);
     }
 
-    count as i32
+    molecules.len()
 }
