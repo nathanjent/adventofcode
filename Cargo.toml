@@ -4,11 +4,10 @@ version = "0.1.0"
 authors = ["Nathan Jent <nathanjent@gmail.com>"]
 
 [dependencies]
-md5 = "0.2.1"
-regex = "0.2.1"
-simple_json = "0.2.3"
-abc = "0.2.3"
-rand = "0.3.15"
-num = "0.1.36"
-generic-matrix = "0.0.7"
-rusty-machine="0.5.4"
+
+adventofcode-rust-2015 = { version = "0.1.0", path = "2015" }
+adventofcode-rust-2016 = { version = "0.1.0", path = "2016" }
+adventofcode-rust-2017 = { version = "0.1.0", path = "2017" }
+
+[workspace]
+members = ["2015","2016","2017"]

@@ -1,0 +1,6 @@
+[package]
+name = "adventofcode-rust-2017"
+version = "0.1.0"
+authors = ["nathanjent <nathanjent@gmail.com>"]
+
+[dependencies]
