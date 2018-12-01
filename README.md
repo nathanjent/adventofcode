@@ -1,2 +1,3 @@
-# adventofcode-rust
-http://adventofcode.com I decided to solve the advent of code puzzles using Rust.
+# adventofcode
+http://adventofcode.com 
+I decided to solve the advent of code puzzles.
