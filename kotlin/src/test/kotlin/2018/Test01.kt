@@ -19,7 +19,7 @@ class Test01(
         val expectedProcess2: String) {
     companion object {
         @JvmStatic
-        @Parameters(name = "{index}: process1({0})={1}, process2({0})={2}")
+        @Parameters(name = "{index}: processFreq1({0})={1}, processFreq2({0})={2}")
         fun inputs(): Collection<Array<String>> {
             return listOf(
                     arrayOf(
@@ -86,13 +86,13 @@ class Test01(
 
     /** Part 1 */
     @Test
-    public fun processTest() {
-        assertEquals(expectedProcess1, process1(input))
+    public fun processFreqTest() {
+        assertEquals(expectedProcess1, processFreq1(input))
     }
 
     /** Part 2 */
     @Test
-    public fun process2Test() {
-        assertEquals(expectedProcess2, process2(input))
+    public fun processFreq2Test() {
+        assertEquals(expectedProcess2, processFreq2(input))
     }
 }

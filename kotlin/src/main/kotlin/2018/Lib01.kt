@@ -1,20 +1,24 @@
 package aoc.kt.y2018;
 
+/**
+ * Day 1.
+ */
+
 /** Part 1 */
-fun process1(input: String): String {
+fun processFreq1(input: String): String {
     val output = input.lines()
     .filter { !it.isEmpty() }
-    .map(Integer::parseInt)
+    .map { it.toInt() }
     .sum()
 
     return output.toString()
 }
 
 /** Part 2 */
-fun process2(input: String): String {
+fun processFreq2(input: String): String {
     val inputs = input.lines()
         .filter { !it.isEmpty() }
-        .map(Integer::parseInt)
+        .map { it.toInt() }
         .toList()
 
     val (firstLoop, result) = inputs
