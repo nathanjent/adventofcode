@@ -44,7 +44,7 @@ class Test02(
                             """.trimMargin(), "0", "fgij"),
                     arrayOf(File("../input/2018/day02.txt")
                         .readText(),
-                        "7350", "42")
+                        "7350", "wmlnjevbfodamyiqpucrhsukg")
             )
         }
     }
