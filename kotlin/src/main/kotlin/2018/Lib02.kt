@@ -54,10 +54,9 @@ fun processBoxChecksum2(input: String): String {
     val maxEntry = matchCounts
         .maxBy { (_, p) -> p.first }
 
-    val (_count, index) = maxEntry?.component2()?:Pair(0, -1)
+    val (_, index) = maxEntry?.component2()?:Pair(0, -1)
     val key = maxEntry?.component1()?:""
-    val words = key.split(':')
-    val word = words.first()
+    val word = key.substringBefore(':')
     val first = word.substring(0 until index)
     val last = word.substring(index+1..word.length-1)
 
