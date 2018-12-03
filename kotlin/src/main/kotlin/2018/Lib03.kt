@@ -13,27 +13,40 @@ package aoc.kt.y2018;
 
 /** Part 1 */
 fun process1(input: String): String {
-    val output = input.lines()
+    var overlapCount = 0
+    val claims = input.lines()
         .filter { !it.isEmpty() }
         .map { it.split(" @ ", ": ") }
         .map {
             val idStr = it.get(0)
-            val id = idStr.substring(1, idStr.length-1)
-                .toInt()
             val position = it.get(1).split(',')
             val size = it.get(2).split('x')
-            val x = position.get(0).toInt()
-            val y = position.get(1).toInt()
-            val w = size.get(0).toInt()
-            val h = size.get(1).toInt()
-            Claim(id, x, y, w, h)
+            Claim(
+                    idStr.substring(1 until idStr.length).toInt(),
+                    position.get(0).toInt(),
+                    position.get(1).toInt(),
+                    size.get(0).toInt(),
+                    size.get(1).toInt())
         }
         .toList()
 
-    return output.toString()
+    for (claim in claims) {
+        for (other in claims) {
+            if (claim.id == other.id) {
+                continue
+            }
+            overlapCount += findOverlappingClaims(claim, other))
+        }
+    }
+
+    return overlapCount.toString()
 }
 
 /** Part 2 */
 fun process2(input: String): String {
     return "42"
+}
+
+fun claimsOverlap(claim1: Claim,claim2: Claim): Int {
+    return 1
 }
