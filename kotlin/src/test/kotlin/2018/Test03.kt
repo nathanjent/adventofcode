@@ -27,10 +27,11 @@ class Test03(
                             |#1 @ 1,3: 4x4
                             |#2 @ 3,1: 4x4
                             |#3 @ 5,5: 2x2
-                            """.trimMargin(), "4", "42"),
-                    arrayOf(File("../input/2018/day03.txt")
-                        .readText(),
-                        "42", "42")
+                            """.trimMargin(), "4", "42")
+                 //           ,
+                 //   arrayOf(File("../input/2018/day03.txt")
+                 //       .readText(),
+                 //       "42", "42")
             )
         }
     }
