@@ -28,10 +28,10 @@ class Test03(
                             |#2 @ 3,1: 4x4
                             |#3 @ 5,5: 2x2
                             """.trimMargin(), "4", "42")
-                 //           ,
-                 //   arrayOf(File("../input/2018/day03.txt")
-                 //       .readText(),
-                 //       "42", "42")
+                            ,
+                    arrayOf(File("../input/2018/day03.txt")
+                        .readText(),
+                        "42", "42")
             )
         }
     }

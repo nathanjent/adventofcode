@@ -5,9 +5,10 @@ package aoc.kt.y2018;
  */
 
 data class Point(
-        val id: Int,
         val x: Int,
-        val y: Int)
+        val y: Int) {
+            var claims: MutableSet<Claim> = mutableSetOf()
+        }
 
 data class Claim(
         val id: Int,
@@ -30,14 +31,14 @@ fun process1(input: String): String {
             val points = mutableListOf<Point>()
             for (x1 in x until x+w) {
                 for (y1 in y until y+h) {
-                    points.add(Point(id, x1, y1))
+                    points.add(Point(x1, y1))
                 }
             }
             Claim(id, points)
         }
         .toList()
 
-    val overlapMap = mutableMapOf<Pair<Int,Int>,Int>()
+    val overlapMap = mutableMapOf<Point,Int>()
     for (claim in claims) {
         for (other in claims) {
             if (claim.id == other.id) {
@@ -46,10 +47,11 @@ fun process1(input: String): String {
             for (claimPoint in claim.points) {
                 for (otherPoint in other.points) {
                     if (claimPoint.x == otherPoint.x &&
-                        claimPoint.y == claimPoint.y) {
-                        val key = Pair(claimPoint.x, claimPoint.y)
-                        val count = overlapMap.getOrDefault(key, 0)
-                        overlapMap.put(key, count + 1)
+                        claimPoint.y == otherPoint.y) {
+                            claimPoint.claims.add(claim)
+                            claimPoint.claims.add(other)
+                        val count = overlapMap.getOrDefault(claimPoint, 0)
+                        overlapMap.put(claimPoint, count + 1)
                     }
                 }
             }
@@ -57,7 +59,20 @@ fun process1(input: String): String {
     }
 
     var overlapCount = overlapMap.filter { it.value > 1 } .count()
-    return overlapMap.toString()
+
+    //return overlapMap.map { (point, value) ->
+    //    val claims = point.claims.map { it.id }.toString()
+    //    val x = point.x
+    //    val y = point.y
+    //    "{ ($x, $y), claims=$claims, value=$value }\n"}.toString() +
+    //        " : " + claims.map {
+    //            val id = it.id
+    //            val points = it.points.map {
+    //                val x = it.x
+    //                val y = it.y
+    //                "\n\t($x, $y)"}.toString()
+    //            "{ id=$id, points=$points }\n" }
+    return overlapCount.toString()
 }
 
 /** Part 2 */
