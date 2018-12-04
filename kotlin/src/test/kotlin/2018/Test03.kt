@@ -31,7 +31,7 @@ class Test03(
                             ,
                     arrayOf(File("../input/2018/day03.txt")
                         .readText(),
-                        "42", "42")
+                        "104712", "42")
             )
         }
     }
