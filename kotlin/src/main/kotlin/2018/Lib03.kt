@@ -10,6 +10,41 @@ data class Point(
 
 /** Part 1 */
 fun process1(input: String): String {
+    val claimMap = getClaimMap(input)
+
+    val overlapCount = claimMap.filter { it.value.count() > 1 } .count()
+
+    return overlapCount.toString()
+}
+
+/** Part 2 */
+fun process2(input: String): String {
+    val claimMap = getClaimMap(input)
+
+    val claimsIntact = mutableMapOf<Int, Boolean>()
+    val id = claimMap
+        .map { Pair(it.key, it.value.toList()) }
+        .fold(claimsIntact, { acc, next ->
+            val idList = next.second
+            if (idList.count() > 1) {
+                idList.forEach { acc.put(it, false) }
+            } else {
+                val id = idList.first()
+                val intact = acc.getOrDefault(id, true)
+                if (intact) {
+                    acc.put(id, true)
+                }
+            }
+            acc
+        })
+        .filter { it.value }
+        .map { it.key }
+        .first()
+
+    return id.toString()
+}
+
+fun getClaimMap(input: String): MutableMap<Point, MutableList<Int>> {
     val claimMap = mutableMapOf<Point, MutableList<Int>>()
     input.lines()
         .filter { !it.isEmpty() }
@@ -32,13 +67,5 @@ fun process1(input: String): String {
                 }
             }
         }
-
-    var overlapCount = claimMap.filter { it.value.count() > 1 } .count()
-
-    return overlapCount.toString()
-}
-
-/** Part 2 */
-fun process2(input: String): String {
-    return "42"
+    return claimMap
 }
