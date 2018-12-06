@@ -38,12 +38,12 @@ class Test03(
     /** Part 1 */
     @Test
     public fun processTest() {
-        assertEquals(expectedProcess1, process1(input))
+        assertEquals(expectedProcess1, processClaims1(input))
     }
 
     /** Part 2 */
     @Test
     public fun process2Test() {
-        assertEquals(expectedProcess2, process2(input))
+        assertEquals(expectedProcess2, processClaims2(input))
     }
 }

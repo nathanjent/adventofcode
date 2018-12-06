@@ -1,7 +1,7 @@
 package aoc.kt.y2018;
 
 /**
- * Day 2.
+ * Day 3.
  */
 
 data class Point(
@@ -9,7 +9,7 @@ data class Point(
         val y: Int)
 
 /** Part 1 */
-fun process1(input: String): String {
+fun processClaims1(input: String): String {
     val claimMap = getClaimMap(input)
 
     val overlapCount = claimMap.filter { it.value.count() > 1 } .count()
@@ -18,7 +18,7 @@ fun process1(input: String): String {
 }
 
 /** Part 2 */
-fun process2(input: String): String {
+fun processClaims2(input: String): String {
     val claimMap = getClaimMap(input)
 
     val claimsIntact = mutableMapOf<Int, Boolean>()

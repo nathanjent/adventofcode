@@ -9,11 +9,11 @@ import org.junit.experimental.theories.DataPoints
 import java.io.File
 
 /**
- * Day 3 tests. Parameterized with expected results
+ * Day 5 tests. Parameterized with expected results
  * for both methods since the data is the same.
  */
 @RunWith(Parameterized::class)
-class Test03(
+class Test05(
         val input: String,
         val expectedProcess1: String,
         val expectedProcess2: String) {
