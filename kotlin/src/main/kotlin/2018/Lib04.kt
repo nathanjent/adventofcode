@@ -61,18 +61,22 @@ fun processRepose1(input: String): String {
     }
     .maxBy { it.second }?.first
 
-    //val minuteGuardSleptMost = guardMap.get(guardWithMostSleepTime)
-    //    .map {
-    //        val sleepStart = it.first
-    //        val sleepEnd = it.second
-    //        val minutesSlept = mutableMapOf()
-    //        for (val time in sleepStart..sleepEnd) {
-    //            minutesSlept.put(time.minute, 1)
-    //        }
-    //        minutesSlept
-    //    }
+    val minuteGuardSleptMost = guardMap.get(guardWithMostSleepTime)?.map {
+        val sleepStart = it.first
+        val sleepEnd = it.second
+        val minutesSlept = mutableMapOf<Int, Long>()
+        var timeCursor = sleepStart
+        while (timeCursor.until(sleepEnd, ChronoUnit.MINUTES) > 0) {
+            val minute = timeCursor.getMinute()
+            val minuteCount = minutesSlept.getOrDefault(minute, 0)
+            minutesSlept.put(minute, minuteCount + 1)
+            timeCursor = timeCursor.plusMinutes(1)
+        }
+        minutesSlept
+    }
 
-    val output = guardWithMostSleepTime//.map { "\n" + it.toString() }
+    val output = minuteGuardSleptMost
+    //.map { "\n" + it.toString() }
 
     return output.toString()
 }
