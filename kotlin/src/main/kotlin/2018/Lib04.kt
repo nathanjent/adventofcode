@@ -61,7 +61,7 @@ fun processRepose1(input: String): String {
     }
     .maxBy { it.second }?.first
 
-    val minuteGuardSleptMost = guardMap.get(guardWithMostSleepTime)?.map {
+    val minuteGuardSleptMost = guardMap.get(guardWithMostSleepTime)?.flatMap {
         val sleepStart = it.first
         val sleepEnd = it.second
         val minutesSlept = mutableMapOf<Int, Long>()
@@ -72,11 +72,16 @@ fun processRepose1(input: String): String {
             minutesSlept.put(minute, minuteCount + 1)
             timeCursor = timeCursor.plusMinutes(1)
         }
-        minutesSlept
-    }
+        minutesSlept.toList()
+    }?.groupBy {
+        it.first
+    }?.map {
+        Pair(it.key, it.value.sumBy { x -> x.second.toInt() })
+    }?.maxBy { it.second }?.first
 
-    val output = minuteGuardSleptMost
-    //.map { "\n" + it.toString() }
+    val output = guardWithMostSleepTime?.let { a ->
+        minuteGuardSleptMost?.let { b -> a * b }
+    }
 
     return output.toString()
 }

@@ -41,11 +41,10 @@ class Test04(
                             |[1518-11-05 00:03] Guard #99 begins shift
                             |[1518-11-05 00:45] falls asleep
                             |[1518-11-05 00:55] wakes up
-                            """.trimMargin(), "42", "42")
-                    //        ,
-                    //arrayOf(File("../input/2018/day04.txt")
-                    //    .readText(),
-                    //    "42", "42")
+                            """.trimMargin(), "240", "42"),
+                    arrayOf(File("../input/2018/day04.txt")
+                        .readText(),
+                        "42", "42")
             )
         }
     }
