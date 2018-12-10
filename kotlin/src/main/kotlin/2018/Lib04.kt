@@ -56,7 +56,7 @@ fun processRepose2(input: String): String {
 
     val m = guardMap.map {
         val minutesSlept = mutableMapOf<Int, Long>()
-        val minutes = it.value.forEach {
+        it.value.forEach {
             val sleepStart = it.first
             val sleepEnd = it.second
             var timeCursor = sleepStart
@@ -80,7 +80,7 @@ fun processRepose2(input: String): String {
         it.third?:-1
     }
 
-    val output = m?.first?.let { a -> m?.second?.let { b -> a * b } }
+    val output = m?.first?.let { a -> m.second?.let { b -> a * b } }
 
     return output.toString()
 }
