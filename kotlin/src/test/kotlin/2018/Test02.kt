@@ -50,12 +50,14 @@ class Test02(
     }
 
     /** Part 1 */
+    @Ignore("Solved")
     @Test
     public fun processTest() {
         assertEquals(expectedProcess1, processBoxChecksum1(input))
     }
 
     /** Part 2 */
+    @Ignore("Solved")
     @Test
     public fun process2Test() {
         assertEquals(expectedProcess2, processBoxChecksum2(input))

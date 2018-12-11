@@ -36,12 +36,14 @@ class Test03(
     }
 
     /** Part 1 */
+    @Ignore("Solved")
     @Test
     public fun processTest() {
         assertEquals(expectedProcess1, processClaims1(input))
     }
 
     /** Part 2 */
+    @Ignore("Solved")
     @Test
     public fun process2Test() {
         assertEquals(expectedProcess2, processClaims2(input))

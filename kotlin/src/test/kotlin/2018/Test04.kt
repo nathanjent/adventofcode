@@ -50,12 +50,14 @@ class Test04(
     }
 
     /** Part 1 */
+    @Ignore("Solved")
     @Test
     public fun processTest() {
         assertEquals(expectedProcess1, processRepose1(input))
     }
 
     /** Part 2 */
+    @Ignore("Solved")
     @Test
     public fun process2Test() {
         assertEquals(expectedProcess2, processRepose2(input))

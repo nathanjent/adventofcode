@@ -85,12 +85,14 @@ class Test01(
     }
 
     /** Part 1 */
+    @Ignore("Solved")
     @Test
     public fun processFreqTest() {
         assertEquals(expectedProcess1, processFreq1(input))
     }
 
     /** Part 2 */
+    @Ignore("Solved")
     @Test
     public fun processFreq2Test() {
         assertEquals(expectedProcess2, processFreq2(input))
