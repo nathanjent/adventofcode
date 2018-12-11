@@ -26,9 +26,11 @@ class Test05(
                             """
                             |dabAcCaCBAcCcaDA
                             """.trimMargin(), "10", "42")
-                    //        ,
-                    //arrayOf(File("../input/2018/day05.txt")
-                    //    .readText(), "42", "42")
+                            ,
+                    arrayOf(File("../input/2018/day05.txt")
+                        .readText(), "42", "42")
+                        // too high 14863
+                        // too low 10387
             )
         }
     }
