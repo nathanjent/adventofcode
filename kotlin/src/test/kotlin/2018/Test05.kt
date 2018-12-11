@@ -22,15 +22,13 @@ class Test05(
         @Parameters(name = "{index}: processPolymer1({0})={1}, processPolymer2({0})={2}")
         fun inputs(): Collection<Array<String>> {
             return listOf(
-                    arrayOf(
-                            """
-                            |dabAcCaCBAcCcaDA
-                            """.trimMargin(), "10", "42")
-                            ,
+                    arrayOf("dabAcCaCBAcCcaDA", "10", "42"),
+                    arrayOf("baaRRBQqbeEFF", "7", "42"),
                     arrayOf(File("../input/2018/day05.txt")
                         .readText(), "42", "42")
                         // too high 14863
                         // too low 10387
+                        // not 10775
             )
         }
     }

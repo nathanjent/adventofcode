@@ -14,7 +14,11 @@ fun processPolymer1(polymer: String): String {
         if (a != null) {
             var b = polymer.getOrNull(cursor)
             var backCursor = cursor - 1
-            while (b?.let { a?.equals(it, true) }?:false) {
+            while (a?.let { x ->
+                b?.let { y ->
+                    x.equals(y, true) && !x.equals(y)
+                }?:false
+            }?:false) {
                 // Note reaction
                 reactions.set(backCursor, true)
                 reactions.set(cursor, true)
@@ -31,8 +35,8 @@ fun processPolymer1(polymer: String): String {
     }
     return reactions.zip(polymer.asIterable())
         .filter { !it.first }
-        .map { it.second }
-        //.count()
+        .map { "\n" + it.second }
+        .count()
         .toString()
 }
 
