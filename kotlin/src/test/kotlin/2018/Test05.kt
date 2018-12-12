@@ -2,6 +2,7 @@ package aoc.kt.y2018;
 
 import kotlin.test.assertEquals
 import org.junit.Test
+import org.junit.Ignore
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
@@ -35,6 +36,7 @@ class Test05(
 
     /** Part 1 */
     @Test
+    @Ignore("On hold")
     public fun processPolymerTest() {
         assertEquals(expectedProcess1, processPolymer1(input))
     }
