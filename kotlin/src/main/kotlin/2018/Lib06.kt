@@ -9,18 +9,16 @@ import kotlin.math.absoluteValue
 /** Part 1 */
 fun processAreas1(input: String): String {
     val coordinateMap = input.lines()
-        .mapIndexed { i, line ->
-            val (xStr, yStr) = line.split(", ")
-            Pair(Point(xStr.toInt(), yStr.toInt()), i)
-        }
-        .toMap()
-
-    var width = -1
-    var height = -1
-    coordinateMap.keys.forEach {
-        if (it.x > width) width = it.x
-        if (it.y > height) height = it.y
+    .mapIndexed { i, line ->
+        val (xStr, yStr) = line.split(", ")
+        Pair(Point(xStr.toInt(), yStr.toInt()), i)
     }
+    .toMap()
+
+    val (width, height) = coordinateMap.keys.fold(Pair(-1, -1), { acc, n ->
+        Pair(if (n.x > acc.first) { n.x } else { acc.first },
+            if (n.y > acc.second) { n.y } else { acc.second })
+    })
 
     val areaMap = mutableMapOf<Point, Point?>()
     for (x in 0..width) {
@@ -49,7 +47,7 @@ fun processAreas1(input: String): String {
     }
 
     return areaMap
-        .toString()
+    .toString()
 }
 
 /** Part 2 */
