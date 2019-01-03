@@ -8,31 +8,11 @@ import kotlin.math.absoluteValue
 
 /** Part 1 */
 fun processAreas1(input: String): String {
-    val coordinateMap = input.lines()
-        .filter { !it.isEmpty() }
-        .mapIndexed { i, line ->
-            val (xStr, yStr) = line.split(", ")
-            Pair(i, Point(xStr.toInt(), yStr.toInt()))
-        }
-        .toMap()
+    val coordinateMap = coordinateMap(input)
 
-    val (width, height) = coordinateMap.values.fold(Pair(-1, -1), { acc, n ->
-        Pair(if (n.x > acc.first) { n.x } else { acc.first },
-        if (n.y > acc.second) { n.y } else { acc.second })
-    })
+    val (width, height) = borderDimensions(coordinateMap)
 
-    val distanceMap = mutableMapOf<Point, MutableMap<Int, Int>>()
-    for (y in 0..height + 1) {
-        for (x in 0..width + 1) {
-            val mapPoint = Point(x, y)
-            for ((id, coordinatePoint) in coordinateMap) {
-                val distance = manhattanDistance(coordinatePoint, mapPoint)
-                val distances = distanceMap.getOrDefault(mapPoint, mutableMapOf())
-                distances.put(id, distance)
-                distanceMap.put(mapPoint, distances)
-            }
-        }
-    }
+    val distanceMap = distanceMap(coordinateMap, width, height)
 
     val areaMap = mutableMapOf<Point, Int>()
     for ((point, dMap) in distanceMap) {
@@ -86,8 +66,23 @@ fun processAreas1(input: String): String {
 }
 
 /** Part 2 */
-fun processAreas2(input: String): String {
-    return "42"
+fun processAreas2(input: String, maxDistanceTotal: Int): String {
+    val coordinateMap = coordinateMap(input)
+
+    val (width, height) = borderDimensions(coordinateMap)
+
+    val distanceMap = distanceMap(coordinateMap, width, height)
+
+    val areas = mutableListOf<Point>()
+    for ((point, dMap) in distanceMap) {
+        if (dMap.values.sum() < maxDistanceTotal) {
+            areas.add(point)
+        }
+    }
+
+    return areas
+    .count()
+    .toString()
 }
 
 fun manhattanDistance(p1: Int, p2: Int, q1: Int, q2: Int): Int {
@@ -96,4 +91,37 @@ fun manhattanDistance(p1: Int, p2: Int, q1: Int, q2: Int): Int {
 
 fun manhattanDistance(p1: Point, p2: Point): Int {
     return manhattanDistance(p1.x, p1.y, p2.x, p2.y)
+}
+
+private fun coordinateMap(input: String): Map<Int, Point> {
+    return input.lines()
+        .filter { !it.isEmpty() }
+        .mapIndexed { i, line ->
+            val (xStr, yStr) = line.split(", ")
+            Pair(i, Point(xStr.toInt(), yStr.toInt()))
+        }
+        .toMap()
+}
+
+private fun borderDimensions(coordinateMap: Map<Int, Point>): Pair<Int, Int> {
+    return coordinateMap.values.fold(Pair(-1, -1), { acc, n ->
+        Pair(if (n.x > acc.first) { n.x } else { acc.first },
+        if (n.y > acc.second) { n.y } else { acc.second })
+    })
+}
+
+private fun distanceMap(coordinateMap: Map<Int, Point>, width: Int, height: Int): Map<Point, Map<Int, Int>> {
+    val distanceMap = mutableMapOf<Point, MutableMap<Int, Int>>()
+    for (y in 0..height + 1) {
+        for (x in 0..width + 1) {
+            val mapPoint = Point(x, y)
+            for ((id, coordinatePoint) in coordinateMap) {
+                val distance = manhattanDistance(coordinatePoint, mapPoint)
+                val distances = distanceMap.getOrDefault(mapPoint, mutableMapOf())
+                distances.put(id, distance)
+                distanceMap.put(mapPoint, distances)
+            }
+        }
+    }
+    return distanceMap
 }

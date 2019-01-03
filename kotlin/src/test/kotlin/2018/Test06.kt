@@ -16,12 +16,13 @@ import java.io.File
 @RunWith(Parameterized::class)
 class Test06(
         val input: String,
+        val maxDistanceTotal: Int,
         val expectedProcess1: String,
         val expectedProcess2: String) {
     companion object {
         @JvmStatic
         @Parameters(name = "{index}: process1({0})={1}, process2({0})={2}")
-        fun inputs(): Collection<Array<String>> {
+        fun inputs(): Collection<Array<Any>> {
             return listOf(
                     arrayOf("""
                         |1, 1
@@ -30,23 +31,24 @@ class Test06(
                         |3, 4
                         |5, 5
                         |8, 9
-                        """.trimMargin(), "17", "42"),
+                        """.trimMargin(), 32, "17", "16"),
                     arrayOf(File("../input/2018/day06.txt")
-                        .readText(), "4233", "42")
+                        .readText(), 10_000, "4233", "45290")
             )
         }
     }
 
     /** Part 1 */
-//    @Ignore("On hold")
+    @Ignore("Solved")
     @Test
     public fun processPolymerTest() {
         assertEquals(expectedProcess1, processAreas1(input))
     }
 
     /** Part 2 */
+    @Ignore("Solved")
     @Test
     public fun processPolymer2Test() {
-        assertEquals(expectedProcess2, processAreas2(input))
+        assertEquals(expectedProcess2, processAreas2(input, maxDistanceTotal))
     }
 }
