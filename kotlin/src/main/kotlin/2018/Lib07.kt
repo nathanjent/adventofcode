@@ -4,54 +4,47 @@ package aoc.kt.y2018;
  * Day 7.
  */
 
+data class Node(val id: Char)
+data class Edge(val before: Char, val after: Char)
+
 /** Part 1 */
 fun processSteps1(input: String): String {
     val stepMatch = " [A-Z] ".toRegex()
-    val stepMap = input.lines()
-        .map {
-            val (first, second) = stepMatch.findAll(it)
-                .map { it.value }
-                .toList()
-            Pair(first, second)
-        }
-        .groupBy { it.first }
-        .map { it.key to Pair(it.value.map { p -> p.second }, false) }
-        .toMap()
+    val nodes = mutableSetOf<Node>()
+    val edges = mutableSetOf<Edge>()
 
-    val output = mutableListOf<String>()
-
-    // Find order
-    with(output) {
-        var current = stepMap.findNext()
-        while (current != null) {
-            current = stepMap.findNext(current)
-            if (current != null) {
-                add(current)
-            }
-        }
+    input.lines().forEach {
+        val (before, after) = stepMatch.findAll(it)
+            .map { it.value.trim().toCharArray() }
+            .filter { it.size == 1 }
+            .map { it.single() }
+            .toList()
+        nodes.add(Node(before))
+        nodes.add(Node(after))
+        edges.add(Edge(before, after))
     }
 
-    return output
+    val output = mutableListOf<Char>()
+
+    // Find order
+    var current: Node? = nodes.find { node ->
+        !edges.map { it.after }.any { it == node.id }
+    }
+    if (current != null) {
+        output.add(current.id)
+        val currentId = current.id
+
+        current = edges.filter { it.before == currentId }
+            .sortedBy { it.after }
+            .map { Node(it.after) }
+            .first()
+    }
+
+    return current
         .toString()
 }
 
 /** Part 2 */
 fun processSteps2(input: String): String {
     return "42"
-}
-
-fun Map<String, Pair<List<String>, Boolean>>.hasNext(current: String? = null): Boolean {
-    return current != null && this.containsKey(current)
-}
-
-fun Map<String, Pair<List<String>, Boolean>>.findNext(current: String? = null): String? {
-    if (current == null) return this.findRoot()
-
-    return this.get(current)?.first?.minBy { it }
-}
-
-fun Map<String, Pair<List<String>, Boolean>>.findRoot(): String {
-    return this.keys.filterNot { step ->
-        this.values.any { nextSteps -> nextSteps.first.contains(step) }
-    }.first()
 }

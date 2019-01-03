@@ -9,45 +9,80 @@ import kotlin.math.absoluteValue
 /** Part 1 */
 fun processAreas1(input: String): String {
     val coordinateMap = input.lines()
-    .mapIndexed { i, line ->
-        val (xStr, yStr) = line.split(", ")
-        Pair(Point(xStr.toInt(), yStr.toInt()), i)
-    }
-    .toMap()
+        .filter { !it.isEmpty() }
+        .mapIndexed { i, line ->
+            val (xStr, yStr) = line.split(", ")
+            Pair(i, Point(xStr.toInt(), yStr.toInt()))
+        }
+        .toMap()
 
-    val (width, height) = coordinateMap.keys.fold(Pair(-1, -1), { acc, n ->
+    val (width, height) = coordinateMap.values.fold(Pair(-1, -1), { acc, n ->
         Pair(if (n.x > acc.first) { n.x } else { acc.first },
-            if (n.y > acc.second) { n.y } else { acc.second })
+        if (n.y > acc.second) { n.y } else { acc.second })
     })
 
-    val areaMap = mutableMapOf<Point, Point?>()
-    for (x in 0..width) {
-        for (y in 0..height) {
-            var maxDistance = -1
-            var maxCoordinatePoint: Point? = null
-            var pointHadEqual: Point? = null
+    val distanceMap = mutableMapOf<Point, MutableMap<Int, Int>>()
+    for (y in 0..height + 1) {
+        for (x in 0..width + 1) {
             val mapPoint = Point(x, y)
-            for ((coordinatePoint, _) in coordinateMap) {
+            for ((id, coordinatePoint) in coordinateMap) {
                 val distance = manhattanDistance(coordinatePoint, mapPoint)
-                if (distance == maxDistance) {
-                    pointHadEqual = coordinatePoint
-                }
-                maxDistance = if (distance > maxDistance) {
-                    maxCoordinatePoint = coordinatePoint
-                    distance
-                } else {
-                    maxDistance
-                }
+                val distances = distanceMap.getOrDefault(mapPoint, mutableMapOf())
+                distances.put(id, distance)
+                distanceMap.put(mapPoint, distances)
             }
-            if (pointHadEqual == maxCoordinatePoint) {
-                maxCoordinatePoint = null
-            }
-            areaMap.put(mapPoint, maxCoordinatePoint)
         }
     }
 
-    return areaMap
-    .toString()
+    val areaMap = mutableMapOf<Point, Int>()
+    for ((point, dMap) in distanceMap) {
+        val minCoordinate = dMap.minBy { it.value }
+        if (minCoordinate != null) {
+            val mapWithoutMin = dMap.minus(minCoordinate.key)
+            val nextMinCoordinate = mapWithoutMin.minBy { it.value }
+            areaMap.put(point, if (nextMinCoordinate == null || minCoordinate.value == nextMinCoordinate.value) {
+                -1
+            } else {
+                minCoordinate.key
+            })
+        }
+    }
+
+    // Remove areas touching border as these are infinite
+    val infiniteAreaCoordinates = areaMap.filter {
+        val pt = it.key
+        pt.x == 0 || pt.y == 0 || pt.x == width || pt.y == height
+    }
+    .map { it.value }
+
+    val finiteAreaCoordinates = areaMap.filter { point ->
+        !infiniteAreaCoordinates.any { infiniteCoordinate ->
+            point.value == infiniteCoordinate
+        }
+    }
+
+    val countMap = mutableMapOf<Int, Int>()
+    for ((_, id) in finiteAreaCoordinates) {
+        val count = countMap.getOrDefault(id, 0)
+        countMap.put(id, count + 1)
+    }
+
+    //var visualMap = ""
+    //for (y in 0..height + 1) {
+    //    for (x in 0..width + 1) {
+    //        if (x == 0) {
+    //            visualMap += '\n'
+    //        }
+    //        val mapPoint = Point(x, y)
+    //        visualMap += "|" + areaMap.get(mapPoint)?:""
+    //    }
+    //}
+
+    val maxFiniteAreaSize = countMap.maxBy { it.value }?.value
+
+    return maxFiniteAreaSize
+    //visualMap
+        .toString()
 }
 
 /** Part 2 */

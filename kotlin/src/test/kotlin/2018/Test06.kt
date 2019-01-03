@@ -2,6 +2,7 @@ package aoc.kt.y2018;
 
 import kotlin.test.assertEquals
 import org.junit.Test
+import org.junit.Ignore
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
@@ -29,15 +30,15 @@ class Test06(
                         |3, 4
                         |5, 5
                         |8, 9
-                        """.trimMargin(), "17", "42")
-                    //,
-                    //arrayOf(File("../input/2018/day06.txt")
-                    //    .readText(), "42", "42")
+                        """.trimMargin(), "17", "42"),
+                    arrayOf(File("../input/2018/day06.txt")
+                        .readText(), "4233", "42")
             )
         }
     }
 
     /** Part 1 */
+//    @Ignore("On hold")
     @Test
     public fun processPolymerTest() {
         assertEquals(expectedProcess1, processAreas1(input))

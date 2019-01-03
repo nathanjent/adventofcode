@@ -23,6 +23,10 @@ class Test05(
         @Parameters(name = "{index}: processPolymer1({0})={1}, processPolymer2({0})={2}")
         fun inputs(): Collection<Array<String>> {
             return listOf(
+                    arrayOf("aA", "0", "42"),
+                    arrayOf("abBA", "0", "42"),
+                    arrayOf("abAB", "4", "42"),
+                    arrayOf("aabAAB", "6", "42"),
                     arrayOf("dabAcCaCBAcCcaDA", "10", "42"),
                     arrayOf("baaRRBQqbeEFF", "7", "42"),
                     arrayOf(File("../input/2018/day05.txt")
@@ -37,7 +41,7 @@ class Test05(
     /** Part 1 */
     @Test
     @Ignore("On hold")
-    public fun processPolymerTest() {
+    public fun processPolymer1Test() {
         assertEquals(expectedProcess1, processPolymer1(input))
     }
 
