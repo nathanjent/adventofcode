@@ -24,23 +24,30 @@ fun processSteps1(input: String): String {
         edges.add(Edge(before, after))
     }
 
-    val output = mutableListOf<Char>()
 
-    // Find order
+    // Find first step
     var current: Node? = nodes.find { node ->
         !edges.map { it.after }.any { it == node.id }
     }
-    if (current != null) {
-        output.add(current.id)
-        val currentId = current.id
 
-        current = edges.filter { it.before == currentId }
+    // Find remaining steps
+    val visited = mutableListOf<Char>()
+    while (current != null) {
+        val currentId = current.id
+        visited.add(currentId)
+        val nextList = edges
+            .filter { it.before == currentId }
             .sortedBy { it.after }
-            .map { Node(it.after) }
-            .first()
+            .map { it.after }
+
+        if (!nextList.isEmpty()) {
+            current = nodes.find { it.id == nextList.first() }
+        } else {
+            current = null
+        }
     }
 
-    return current
+    return visited
         .toString()
 }
 

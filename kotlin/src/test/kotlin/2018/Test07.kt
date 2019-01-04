@@ -41,7 +41,7 @@ class Test07(
 
     /** Part 1 */
     @Test
-    @Ignore("On hold")
+    //@Ignore("On hold")
     public fun processStepsTest() {
         assertEquals(expectedProcess1, processSteps1(input))
     }
