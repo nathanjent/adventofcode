@@ -4,43 +4,68 @@ import (
 	"strings"
 )
 
+type TreeMap struct {
+	treeLocations [][]bool
+	mapWidth int
+	mapHeight int
+}
+
+type Slope struct {
+	RightMotion int
+	DownMotion int
+}
+
 func FindTreeEncounters(input *string) (int, error) {
-	downMotion := 1
-	rightMotion := 3
-	lines := strings.Split(*input, "\n")
+	treeMap := CreateTreeMap(input)
+	slope := Slope { 3, 1 }
+	treeEncounters := FindTreeEncountersForSlope(treeMap, slope)
+	return treeEncounters, nil
+}
 
-	// create a map of trees on the slopes
-	mapWidth := len(lines[0])
-	mapHeight := len(lines)
-	treeMap := make([][]bool, mapHeight)
-	for i := range treeMap {
-		treeMap[i] = make([]bool, mapWidth)
+func FindProductOfTreeEncountersForSlopes(input *string, slopes []Slope) (int, error) {
+	treeMap := CreateTreeMap(input)
+	var treeEncountersProduct = 1
+	for _, slope := range slopes {
+		treeEncountersProduct *= FindTreeEncountersForSlope(treeMap, slope)
 	}
+	return treeEncountersProduct, nil
+}
 
-	// parse tree map from input
-	for i, line := range lines {
-		for j, char := range line {
-			// set if location contains tree
-			treeMap[i][j] = char == '#'
-		}
-	}
-
+func FindTreeEncountersForSlope(treeMap TreeMap, slope Slope) (int) {
 	var curPosX, curPosY = 0, 0
 	var treeEncounters = 0
 	for {
-		if curPosY >= mapHeight {
-			return treeEncounters, nil
+		if curPosY >= treeMap.mapHeight {
+			return treeEncounters
 		}
 
-		// map repeats to the right
-		mapPosX := curPosX % mapWidth
-
-		locationHasTree := treeMap[curPosY][mapPosX]
+		mapPosX := curPosX % treeMap.mapWidth
+		locationHasTree := treeMap.treeLocations[curPosY][mapPosX]
 		if locationHasTree {
 			treeEncounters++
 		}
 
-		curPosX += rightMotion
-		curPosY += downMotion
+		curPosX += slope.RightMotion
+		curPosY += slope.DownMotion
 	}
+}
+
+func CreateTreeMap(input *string) (TreeMap) {
+	lines := strings.Split(*input, "\n")
+
+	mapWidth := len(lines[0])
+	mapHeight := len(lines)
+	treeLocations := make([][]bool, mapHeight)
+	for i := range treeLocations {
+		treeLocations[i] = make([]bool, mapWidth)
+	}
+
+	for i, line := range lines {
+		for j, char := range line {
+
+			treeLocations[i][j] = char == '#'
+		}
+	}
+
+	return TreeMap{ treeLocations, mapWidth, mapHeight }
 }
