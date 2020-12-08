@@ -1,8 +1,35 @@
 package binary_boarding
 
 import (
+	"errors"
+	"sort"
 	"strings"
 )
+
+func FindMySeat(input *string) (int, error) {
+	seatIds := ParseSeatIds(input)
+
+	sort.Ints(seatIds)
+	var mySeatId = -1
+	for i, seatId := range seatIds {
+		if i == 0 {
+			continue
+		}
+
+		// Check for gap in seat ids
+		if seatId - 2 == seatIds[i - 1] {
+
+			mySeatId = seatId - 1
+			break
+		}
+	}
+
+	if mySeatId == -1 {
+		return mySeatId, errors.New("Your seat id could not be found")
+	}
+
+	return mySeatId, nil
+}
 
 func FindHighestSeatId1(input *string) (int, error) {
 	seatIds := ParseSeatIds(input)
@@ -11,6 +38,9 @@ func FindHighestSeatId1(input *string) (int, error) {
 		if maxSeatId < seatId {
 			maxSeatId = seatId
 		}
+	}
+	if maxSeatId == 0 {
+		return maxSeatId, errors.New("Seat ids should be positive integers.")
 	}
 
 	return maxSeatId, nil

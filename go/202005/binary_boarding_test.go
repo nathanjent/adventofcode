@@ -67,3 +67,36 @@ func TestFindHighestSeatId1(t *testing.T) {
 		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
 	}
 }
+
+func TestParseSeatId5(t *testing.T) {
+	input := `FBFBBFFRRR`
+	var want = 359
+	result := ParseSeatId(input)
+	if want != result {
+		t.Fatalf(`Want %v got %v`, want, result)
+	}
+}
+
+func TestFindMySeatBasic(t *testing.T) {
+	input := `FBFBBFFRLR
+FBFBBFFRRR
+`
+	var want = 358
+	result, err := FindMySeat(&input)
+	if want != result || err != nil {
+		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
+	}
+}
+
+func TestFindMySeat(t *testing.T) {
+	data, err := ioutil.ReadFile("input.txt")
+	if err != nil {
+		t.Fatalf("Failed to read \"input.txt\". %v", err)
+	}
+	input := string(data)
+	var want = 603
+	result, err := FindMySeat(&input)
+	if want != result || err != nil {
+		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
+	}
+}
