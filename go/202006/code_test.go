@@ -64,15 +64,15 @@ b`
 	}
 }
 
-//func TestFindSumOfUnanimousYes(t *testing.T) {
-//	data, err := ioutil.ReadFile("input.txt")
-//	if err != nil {
-//		t.Fatalf("Failed to read \"input.txt\". %v", err)
-//	}
-//	input := string(data)
-//	var want = 42
-//	result, err := FindSumOfUnanimousYes(&input)
-//	if want != result || err != nil {
-//		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
-//	}
-//}
+func TestFindSumOfUnanimousYes(t *testing.T) {
+	data, err := ioutil.ReadFile("input.txt")
+	if err != nil {
+		t.Fatalf("Failed to read \"input.txt\". %v", err)
+	}
+	input := string(data)
+	var want = 3360
+	result, err := FindSumOfUnanimousYes(&input)
+	if want != result || err != nil {
+		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
+	}
+}

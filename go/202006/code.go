@@ -1,7 +1,6 @@
 package custom_customs
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -50,8 +49,9 @@ func FindSumOfUnanimousYes(input *string) (int, error) {
 			// add next group set
 			unanimousAnswerSet = map[rune]struct{}{}
 			answerSets = append(answerSets, unanimousAnswerSet)
-			answerSetCursor = 0
 			answerSetsCursor++
+			answerSetCursor = 0
+			continue
 		}
 
 		if answerSetCursor == 0 {
@@ -59,31 +59,25 @@ func FindSumOfUnanimousYes(input *string) (int, error) {
 			for _, question := range line {
 				unanimousAnswerSet[question] = struct{}{}
 			}
-			continue
-		}
-
-		// create a set of yes answers for this line
-		thisAnswerSet := map[rune]struct{}{}
-		for _, question := range line {
-			thisAnswerSet[question] = struct{}{}
-		}
-
-		// update running list to remove yes answers that are no longer unanimous
-		updatedAnswerSet := map[rune]struct{}{}
-		for question := range unanimousAnswerSet {
-			if _, ok := unanimousAnswerSet[question]; ok {
-				updatedAnswerSet[question] = struct{}{}
+		} else {
+			// create a set of yes answers for this line
+			thisAnswerSet := map[rune]struct{}{}
+			for _, question := range line {
+				thisAnswerSet[question] = struct{}{}
 			}
+
+			// update running list to remove yes answers that are no longer unanimous
+			updatedAnswerSet := map[rune]struct{}{}
+			for question := range unanimousAnswerSet {
+				if _, ok := thisAnswerSet[question]; ok {
+					updatedAnswerSet[question] = struct{}{}
+				}
+			}
+
+			// replace the running unanimous set
+			unanimousAnswerSet = updatedAnswerSet
+			answerSets[answerSetsCursor] = unanimousAnswerSet
 		}
-		fmt.Printf("line: %v\n", line)
-		fmt.Printf("unanimousAnswerSet: %v\n", unanimousAnswerSet)
-		fmt.Printf("thisAnswerSet: %v\n", thisAnswerSet)
-		fmt.Printf("updatedAnswerSet: %v\n", updatedAnswerSet)
-
-		// replace the running unanimous set
-		unanimousAnswerSet = updatedAnswerSet
-		answerSets[answerSetsCursor] = unanimousAnswerSet
-
 		answerSetCursor++
 	}
 
