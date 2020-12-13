@@ -1,7 +1,6 @@
 package handy_haversacks
 
 import (
-	//"fmt"
 	"strconv"
 	"strings"
 )
@@ -11,46 +10,63 @@ func FindMaxShinyBagContainers(input *string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	//fmt.Printf("%q\n", rules)
 
 	// find the bag names which could hold my shiny bag
 	// if enclosed following the rules
 	canContainShinyGoldCount := 0
-	var sum int64 = 0
 	for containerColor := range rules {
-		//fmt.Println()
 		// check if container can hold my shiny gold bag
-		currentCount, containsShinyBag := CheckRules(0, &containerColor, rules)
-		if containsShinyBag {
+		if CanContainShinyGoldBag(&containerColor, rules) {
 			canContainShinyGoldCount++
 		}
-		sum += currentCount
 	}
 
 	return canContainShinyGoldCount, nil
 }
 
-func CheckRules(sum int64, containerColor *string, rules RuleMap) (int64, bool) {
+func CanContainShinyGoldBag(containerColor *string, rules RuleMap) (bool) {
 	containsShinyBag := false
 	containedBags := rules[*containerColor]
-	//fmt.Printf("%q => %q\n", *containerColor, containedBags)
-	if count, ok := containedBags["shiny gold"]; ok {
+	if _, ok := containedBags["shiny gold"]; ok {
 		// shiny gold found end the search
-		//fmt.Println("it can hold a shiny gold bag")
-		return sum + count, true
+		return true
 	}
 
 	// The container cannot hold my shiny gold bag
 	// directly. Continue searching.
+	for bagColor, _ := range containedBags {
+		containedShiny := CanContainShinyGoldBag(&bagColor, rules)
+		containsShinyBag = containsShinyBag || containedShiny
+	}
+
+	return containsShinyBag
+}
+
+func CountOfBagsRequiredInShinyGoldBag(input *string) (int64, error) {
+	rules, err := ParseRules(input)
+	if err != nil {
+		return 0, err
+	}
+	bagColor := "shiny gold"
+	countOfBags := CountBags(&bagColor, rules)
+
+	return countOfBags, nil
+}
+
+func CountBags(containerColor *string, rules RuleMap) (int64) {
+	containedBags := rules[*containerColor]
+	if len(containedBags) == 0 {
+		return 0
+	}
+	var sum int64 = 0
 	for bagColor, bagCount := range containedBags {
-		if _, ok := rules[bagColor]; ok {
-			count, containedShiny := CheckRules(bagCount, &bagColor, rules)
-			containsShinyBag = containsShinyBag || containedShiny
-			sum += count
+		for i := 0; i < int(bagCount); i++ {
+			sum += CountBags(&bagColor, rules)
+			sum += 1
 		}
 	}
 
-	return sum, containsShinyBag
+	return sum
 }
 
 type RuleMap = map[string]map[string]int64

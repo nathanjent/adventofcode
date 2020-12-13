@@ -34,3 +34,31 @@ func TestFindMaxShinyBagContainer(t *testing.T) {
 		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
 	}
 }
+
+func TestCountOfBagsRequiredInShinyGoldBagBasic(t *testing.T) {
+	input := `shiny gold bags contain 2 dark red bags.
+dark red bags contain 2 dark orange bags.
+dark orange bags contain 2 dark yellow bags.
+dark yellow bags contain 2 dark green bags.
+dark green bags contain 2 dark blue bags.
+dark blue bags contain 2 dark violet bags.
+dark violet bags contain no other bags.`
+	var want int64 = 126
+	result, err := CountOfBagsRequiredInShinyGoldBag(&input)
+	if want != result || err != nil {
+		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
+	}
+}
+
+func TestCountOfBagsRequiredInShinyGoldBag(t *testing.T) {
+	data, err := ioutil.ReadFile("input.txt")
+	if err != nil {
+		t.Fatalf("Failed to read \"input.txt\". %v", err)
+	}
+	input := string(data)
+	var want int64 = 5312
+	result, err := CountOfBagsRequiredInShinyGoldBag(&input)
+	if want != result || err != nil {
+		t.Fatalf(`Error: "%v", want %v got %v`, err, want, result)
+	}
+}
