@@ -1,7 +1,7 @@
 package adapter_array
 
 import (
-	"fmt"
+	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -22,15 +22,8 @@ func FindJoltDifferences(input *string) (int64, error) {
 	var joltageDifferenceOf3Count int64 = 1
 	for i := 0; i < len(adapterRatings); i++ {
 		// find adapters within 1-3 difference not yet checked
-		adaptersInRange := []int64{}
-		for _, adapterRating := range adapterRatings {
-			if adapterRating <= previousJoltage + 3 && !any(checkedAdapters, func (n int64) bool {
-				return n == adapterRating
-			}) {
-				adaptersInRange = append(adaptersInRange, adapterRating)
-			}
-		}
-		fmt.Printf("joltagesInRange: %v\n", adaptersInRange)
+		adaptersInRange := FindLargerAdaptersInRange(adapterRatings, previousJoltage)
+		//log.Printf("adaptersInRange: %v\n", adaptersInRange)
 		var minAdapterRatingInRange int64 = math.MaxInt64
 		for _, adapterRating := range adaptersInRange {
 			if adapterRating < minAdapterRatingInRange {
@@ -56,13 +49,63 @@ func FindJoltDifferences(input *string) (int64, error) {
 	return joltageDifferenceOf1Count * joltageDifferenceOf3Count, nil
 }
 
-func any(items []int64, predicate func(n int64) bool) bool {
-	for _, item := range items {
-		if predicate(item) {
-			return true
+func FindDistinctAdapterArrangments(input *string) (int, error) {
+	adapterRatings, err := ParseAdapterRatings(input)
+	if err != nil {
+		return 0, err
+	}
+
+	var chargingOutletJoltage int64 = 0
+	//visitedAdapters := []int64{}
+	counter := Counter{}
+	mem := MemoizedCount{}
+	FindAdapterArrangements(adapterRatings, chargingOutletJoltage, &counter, &mem /*, visitedAdapters*/)
+	log.Printf("memoized counts: %v\n", mem)
+
+	return counter.Count, nil
+}
+
+type MemoizedCount = map[int64]int
+
+func FindAdapterArrangements(adapterRatings []int64, previousJoltage int64, counter *Counter, mem *MemoizedCount /*, visited []int64*/) {
+	//log.Printf("previousJoltage: %v\n", previousJoltage)
+	adaptersInRange := FindLargerAdaptersInRange(adapterRatings, previousJoltage)
+	if len(adaptersInRange) == 0 {
+		counter.Increment()
+		return
+	}
+	for _, adapterRating := range adaptersInRange {
+		//visitedBranch := makeCopy(visited)
+		//visitedBranch = append(visitedBranch, adapterRating)
+		memoized := *mem
+		if memCount, ok := memoized[adapterRating]; ok {
+			counter.Add(memCount)
+		} else {
+			branchCounter := Counter{}
+			FindAdapterArrangements(adapterRatings, adapterRating, &branchCounter, mem /*, visitedBranch*/)
+			counter.Add(branchCounter.Count)
+			memoized[adapterRating] = branchCounter.Count
 		}
 	}
-	return false
+}
+
+type Counter struct{ Count int }
+
+func (counter *Counter) Increment() { counter.Count++ }
+func (counter *Counter) Add(count int) {
+	counter.Count += count
+}
+
+// find adapters within 1-3 difference but not in the filtered slice
+func FindLargerAdaptersInRange(adapterRatings []int64, joltage int64) []int64 {
+	adaptersInRange := []int64{}
+	for _, adapterRating := range adapterRatings {
+		if adapterRating > joltage && adapterRating <= joltage+3 {
+			adaptersInRange = append(adaptersInRange, adapterRating)
+		}
+	}
+
+	return adaptersInRange
 }
 
 func ParseAdapterRatings(input *string) ([]int64, error) {
