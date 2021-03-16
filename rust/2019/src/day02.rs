@@ -7,10 +7,10 @@ fn intcode_parse(file: &str) -> Vec<u32> {
     let input = File::open(file).expect("File open fail.");
     let mut buf = String::new();
     let _ = BufReader::new(input).read_to_string(&mut buf);
-    buf.trim().split(',')
-        .filter_map(|s| {
-            str::parse::<u32>(s).ok()
-        }).collect()
+    buf.trim()
+        .split(',')
+        .filter_map(|s| str::parse::<u32>(s).ok())
+        .collect()
 }
 
 #[allow(dead_code)]
@@ -29,7 +29,7 @@ fn intcode_runner(mut prog: Vec<u32>) -> u32 {
                 prog[store as usize] = prog[left as usize] + prog[right as usize];
                 //println!("{1} + {2} = {0}", prog[store as usize], prog[left as usize], prog[right as usize]);
                 pc = pc + 4;
-            },
+            }
             2 => {
                 let left = prog[pc + 1];
                 let right = prog[pc + 2];
@@ -38,10 +38,10 @@ fn intcode_runner(mut prog: Vec<u32>) -> u32 {
                 prog[store as usize] = prog[left as usize] * prog[right as usize];
                 //println!("{1} + {2} = {0}", prog[store as usize], prog[left as usize], prog[right as usize]);
                 pc = pc + 4;
-            },
+            }
             99 => {
                 break;
-            },
+            }
             _ => panic!("Intcode program error"),
         }
     }
@@ -82,33 +82,25 @@ mod tests {
 
     #[test]
     fn test_base1() {
-        let prog = vec![
-            1,0,0,0,99
-        ];
+        let prog = vec![1, 0, 0, 0, 99];
         assert_eq!(crate::day02::intcode_runner(prog), 2);
     }
 
     #[test]
     fn test_base2() {
-        let prog = vec![
-            2,3,0,3,99
-        ];
+        let prog = vec![2, 3, 0, 3, 99];
         assert_eq!(crate::day02::intcode_runner(prog), 2);
     }
 
     #[test]
     fn test_base3() {
-        let prog = vec![
-            2,4,4,5,99,0
-        ];
+        let prog = vec![2, 4, 4, 5, 99, 0];
         assert_eq!(crate::day02::intcode_runner(prog), 2);
     }
 
     #[test]
     fn test_base4() {
-        let prog = vec![
-            1,1,1,4,99,5,6,0,99
-        ];
+        let prog = vec![1, 1, 1, 4, 99, 5, 6, 0, 99];
         assert_eq!(crate::day02::intcode_runner(prog), 30);
     }
 
@@ -124,6 +116,9 @@ mod tests {
     #[test]
     fn test2() {
         let prog = crate::day02::intcode_parse("../../input/2019/day02.txt");
-        assert_eq!(crate::day02::concatenated_inputs_from_output_compute(19690720, prog), Some(6472));
+        assert_eq!(
+            crate::day02::concatenated_inputs_from_output_compute(19690720, prog),
+            Some(6472)
+        );
     }
 }
