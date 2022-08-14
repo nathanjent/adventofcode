@@ -1,0 +1,6 @@
+root = true
+
+[*.go]
+indent_type = tabs
+indent_width = 4
+charset = utf-8
